@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "auroraLibrary",
+			"path": "../../auroraLibrary"
+		},
+		{
+			"name": ".github",
+			"path": "../.github"
+		},
+		{
+			"name": ".vscode",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
