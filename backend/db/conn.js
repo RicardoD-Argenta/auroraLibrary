@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 async function connectDB() {
     try {
-        await mongoose.connect("mongodb://localhost:27017/app_lib") // Não vou proteger pois é um programa de código aberto
+        await mongoose.connect(process.env.MONGODB_URI || process.env.DATABASE_URL) // Não vou proteger pois é um programa de código aberto
     } catch (error) {
         console.log("Falha ao iniciar o banco", error)
         throw error

@@ -21,14 +21,10 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')))
 // Rotas
 const connectDB = require('./db/conn')
 const AuthRoutes = require('./routes/AuthRoutes')
-const SchoolRoutes = require('./routes/SchoolRoutes')
-const BookRoutes = require('./routes/BookRoutes')
-const LoanRoutes = require('./routes/LoanRoutes')
+
 
 app.use('/auth', AuthRoutes)
-app.use('/school', SchoolRoutes)
-app.use('/book', BookRoutes)
-app.use('/loan', LoanRoutes)
+
 
 // Inicialização
 const start = async () => {

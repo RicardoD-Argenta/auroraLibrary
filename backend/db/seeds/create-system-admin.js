@@ -4,13 +4,8 @@ const bcrypt = require('bcrypt')
 
 // models
 const User = require('../../models/User/User')
-const School = require('../../models/School/School')
-const UserSchool = require('../../models/User/UserSchool')
-const Country = require('../../models/School/Country')
-const State = require('../../models/School/State')
-const City = require('../../models/School/City')
-const SchoolLicense = require('../../models/School/SchoolLicense')
-const SchoolParams = require('../../models/School/SchoolParams')
+const Library = require('../../models/Library/Library')
+const LibraryParams = require('../../models/Library/LibraryParams')
 
 // helpers
 const createUserToken = require('../../helpers/createUserToken')
@@ -19,82 +14,35 @@ async function seed(){
 
     try {
         
-         // verifica se já existe um arquiteto
-        const existingAdmin = await UserSchool.findOne({ role: 'architect' })
+        // verifica se já existe um administrador
+        const existingAdmin = await User.findOne({ role: 'admin' })
         if (existingAdmin) {
-            console.log('Arquiteto já existe, pulando seed...')
+            console.log('Administrador já existe, pulando seed...')
             return
         }
 
-        // cria pais
-        const country = new Country({
-            name: 'PAIS',
-            abbreviation: '000'
+        // cria uma biblioteca
+        const library = new Library({
+            name: 'Library',
         })
 
-        await country.save()
-        console.log('Pais criado com sucesso')
+        await library.save()
 
-        // cria estado
-        const state = new State({
-            name: 'ESTADO',
-            abbreviation: '000',
-            countryId: country._id
+        // criação do libraryParams
+        const libraryParams = new LibraryParams({
+            libraryId: library._id,
         })
+        await libraryParams.save()
 
-        await state.save()
-        console.log('Estado criado com sucesso')
-
-
-        // cria cidade
-        const city = new City({
-            name: 'CIDADE',
-            stateId: state._id
-        })
-
-        await city.save()
-        console.log('Cidade criada com sucesso')
-
-
-        // cria licença da escola
-        const schoolLicense = new SchoolLicense({
-            startDate: new Date('2000-01-01'),
-            finishDate: new Date('2099-12-31')
-        })
-
-        await schoolLicense.save()
-        console.log('Licença da escola criada com sucesso')
-
-        // cria uma escola base
-        const school = new School({
-            name: 'Inovatech',
-            code: '00000000',
-            address: 'Rua da desordem, 00',
-            cityId: city._id,
-            email: 'admin@inovatech.com.br',
-            phone: '1122334455',
-            taxId: '11111111111',
-            SchoolLicenseId: schoolLicense._id,
-            isActive: true
-        })
-
-        await school.save()
-
-        // criação do schoolParams
-        const schoolParams = new SchoolParams({
-            schoolId: school._id,
-        })
-        await schoolParams.save()
-
-        console.log('Escola criada com sucesso')
+        console.log('Biblioteca criada com sucesso')
 
 
         // cria um usuário 
         const user = new User({
-            name: 'Arquiteto',
-            email: 'arquiteto@inovatech.com.br',
-            phone: '1122334455',
-            password: '123456789'
+            name: 'Admin',
+            login: 'admin',
+            password: 'inovatechadmin',
+            role: 'admin'
         })
 
         const salt = await bcrypt.genSalt(12)
@@ -105,26 +53,16 @@ async function seed(){
         const token = await createUserToken(newUser)
         console.log('Usuário criado com sucesso', { userId: newUser._id })
 
-        // cria role
-
-        const userSchool = new UserSchool({
-            userId: user._id,
-            schoolId: school._id,
-            role: 'architect'
-        })
-
-        await userSchool.save()
-        console.log('Usuário cadastrado com sucesso')
+        console.log('Usuário cadastrado com sucesso \n')
         
-        
+        console.log('🎉 SEED DE ADMINISTRADOR CRIADO COM SUCESSO! 🎉')
         console.log('🔑 Token gerado:', token)
-
         console.log('\n🎉 SETUP COMPLETO!')
-        console.log('📧 Email: arquiteto@inovatech.com.br')
-        console.log('🔑 Senha: 123456789')
+        console.log('📧 Login: admin')
+        console.log('🔑 Senha: inovatechadmin')
         console.log('⚠️  LEMBRE-SE DE MUDAR A SENHA NO PRIMEIRO LOGIN!\n')
     } catch (error) {
-        console.error('❌ Erro ao criar arquiteto:', error)
+        console.error('❌ Erro ao criar administrador:', error)
         throw error
     }
 

@@ -7,7 +7,7 @@ const Loans = mongoose.model(
         {
         copyCode: {
             type: Schema.Types.ObjectId,
-            ref: 'BookCopy',
+            ref: 'Book',
             required: true
         },
         userId: {

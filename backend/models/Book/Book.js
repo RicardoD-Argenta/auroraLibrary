@@ -16,14 +16,17 @@ const Book = mongoose.model(
         },
         authors: [{
             type: Schema.Types.ObjectId,
+            ref: 'Author',
             required:true
         }],
         publisherId: {
             type: Schema.Types.ObjectId,
+            ref: 'Publisher',
             required: true
         },
         genreId: [{
             type: Schema.Types.ObjectId,
+            ref: 'Genre',
             required:true
         }],
         language: {
@@ -61,9 +64,9 @@ const Book = mongoose.model(
         },
         bookCopy: {
             sectorId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Sector',
-            required: true
+                type: Schema.Types.ObjectId,
+                ref: 'Sector',
+                required: true
             },
             shelfId: {
                 type: Schema.Types.ObjectId,

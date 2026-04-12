@@ -22,7 +22,11 @@ const User = mongoose.model(
             required: true,
             minlength: 8,
             maxlength: 255
-        }
+        },
+        role: {
+            type: String,
+            enum: ['admin', 'librarian', 'member'],
+        },
     },
     { timestamps: true }
     ),
