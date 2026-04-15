@@ -9,6 +9,8 @@ const emptyFields = require('../helpers/emptyFields') // verifica se os campos o
 const validateID = require('../helpers/validateID') // verifica se o ID é válido
 
 module.exports = class UserController {
+
+    // ------------------------ criação de usuário ------------------------ //
     static async register(req, res) {
         emptyBody(req, res)
 
