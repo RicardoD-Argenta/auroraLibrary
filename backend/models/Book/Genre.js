@@ -9,11 +9,6 @@ const Genre = mongoose.model(
             type: String,
             maxlength: 255,
             required: true
-        },
-        parentId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Genre',
-            default: null
         }
     },
     { timestamps: true }
