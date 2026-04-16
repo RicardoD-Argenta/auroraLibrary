@@ -21,9 +21,11 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')))
 // Rotas
 const connectDB = require('./db/conn')
 const AuthRoutes = require('./routes/AuthRoutes')
+const BookRoutes = require('./routes/BookRoutes')
 
 
 app.use('/auth', AuthRoutes)
+app.use('/book', BookRoutes)
 
 
 // Inicialização
