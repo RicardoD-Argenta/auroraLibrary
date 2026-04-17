@@ -32,7 +32,7 @@ const validateSingleDate = (date) => {
 }
 
 const isDate = (config) => {
-    return (req, res, next) => {
+    return (req) => {
         const {
             dates = [],
             labels = {}
@@ -46,18 +46,15 @@ const isDate = (config) => {
 
         if (invalidDates.length > 0) {
             const invalidLabels = invalidDates.map(f => labels[f] || f)
-            res.status(400).json({
-                message: `Datas inválidas: ${invalidLabels.join(', ')}`
-            })
-            return false
+            return {
+                valid: false,
+                status: 400,
+                message: `Datas inválidas: ${invalidLabels.join(', ')}`,
+                err: 'invalid-date'
+            }
         }
 
-        if (typeof next === 'function') {
-            next()
-            return
-        }
-
-        return true
+        return { valid: true }
     }
 }
 

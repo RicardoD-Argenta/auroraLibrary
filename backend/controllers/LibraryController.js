@@ -15,9 +15,17 @@ module.exports = class LibraryController {
 
     // ------------------------ criação de membros ------------------------ //
     static async registerMember(req, res) {
-        emptyBody(req, res)
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
 
         const { name, email, phone, student, member, observations } = req.body
+        const studentData = student ?? {}
+        const memberData = member ?? {}
 
         // verifica os campos obrigatórios
         const fieldsConfig = {
@@ -29,8 +37,8 @@ module.exports = class LibraryController {
             }
         }
 
-        if (student.isStudent === 'true') {
-            if (member.isMember === 'true') {
+        if (studentData.isStudent === 'true') {
+            if (memberData.isMember === 'true') {
                 return res.status(400).json({
                     message: 'Um usuário não pode ser estudante e membro ao mesmo tempo',
                     err: 'student-member-conflict'
@@ -39,11 +47,11 @@ module.exports = class LibraryController {
             fieldsConfig.required.push('student.studentClass')
             fieldsConfig.labels['student.studentClass'] = 'Classe'
         } else {
-            student.studentClass = null
+            studentData.studentClass = null
         }
 
-        if (member.isMember === 'true') {
-            if (student.isStudent === 'true') {
+        if (memberData.isMember === 'true') {
+            if (studentData.isStudent === 'true') {
                 return res.status(400).json({
                     message: 'Um usuário não pode ser membro e estudante ao mesmo tempo',
                     err: 'member-student-conflict'
@@ -55,10 +63,10 @@ module.exports = class LibraryController {
             fieldsConfig.labels.email = 'Email'
             fieldsConfig.labels.phone = 'Telefone'
         } else {
-            member.memberSince = null
+            memberData.memberSince = null
         }
 
-        if (member.isMember === 'false' && student.isStudent === 'false') {
+        if (memberData.isMember === 'false' && studentData.isStudent === 'false') {
             return res.status(400).json({
                 message: 'Um usuário deve ser membro ou estudante',
                 err: 'member-student-conflict'
@@ -66,10 +74,15 @@ module.exports = class LibraryController {
         }
 
         const reqFields = emptyFields(fieldsConfig)
-        const ok = reqFields(req, res)
-        if (!ok) return
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
 
-        if (member.memberSince && member.memberSince.trim() !== '') {
+        if (memberData.memberSince && memberData.memberSince.trim() !== '') {
             // verifica se a data é válida
             const dates = isDate({
                 dates: ['member.memberSince'],
@@ -77,18 +90,23 @@ module.exports = class LibraryController {
                     'member.memberSince': 'Data de entrada'
                 }
             })
-            const okDates = dates(req, res)
-            if (!okDates) return
+            const datesValidation = dates(req)
+            if (!datesValidation.valid) {
+                return res.status(datesValidation.status).json({
+                    message: datesValidation.message,
+                    err: datesValidation.err
+                })
+            }
         }
 
         const validBooleanFields = validateBooleanFields([
             {
-                value: student.isStudent,
+                value: studentData.isStudent,
                 field: 'student.isStudent',
                 err: 'student-isStudent-not-valid'
             },
             {
-                value: member.isMember,
+                value: memberData.isMember,
                 field: 'member.isMember',
                 err: 'member-isMember-not-valid'
             }
@@ -106,8 +124,9 @@ module.exports = class LibraryController {
             // verifica se o email é valido
             validMail = validateEmail(email)
             if (!validMail.valid) {
-                return res.status(400).json({
-                    message: validMail.message
+                return res.status(validMail.status).json({
+                    message: validMail.message,
+                    err: validMail.err
                 })
             }
         }
@@ -117,8 +136,9 @@ module.exports = class LibraryController {
             // verifica se o telefone é valido
             validPhone = validatePhone(phone)
             if (!validPhone.valid) {
-                return res.status(400).json({
-                    message: validPhone.message
+                return res.status(validPhone.status).json({
+                    message: validPhone.message,
+                    err: validPhone.err
                 })
             } 
         }
@@ -127,8 +147,8 @@ module.exports = class LibraryController {
             name,
             email: validMail && validMail.email ? validMail.email : null,
             phone: validPhone && validPhone.phone ? validPhone.phone : null,
-            student,
-            member,
+            student: studentData,
+            member: memberData,
             observations
         })
 
@@ -144,6 +164,239 @@ module.exports = class LibraryController {
             })
         }
 
+    }
+
+    static async getAllMembers(req, res) {
+        const result = await libraryService.getAllMembers()
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                members: result.members
+            })
+        }
+    }
+
+
+    static async getMember(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await libraryService.getMember({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                member: result.member
+            })
+        }
+    }
+
+    static async updateMember(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { name, email, phone, student, member, observations } = req.body
+        const studentData = student ?? {}
+        const memberData = member ?? {}
+
+        // verifica os campos obrigatórios
+        const fieldsConfig = {
+            required: ['name', 'student.isStudent', 'member.isMember'],
+            labels: {
+                name: 'Nome',
+                'student.isStudent': 'Estudante',
+                'member.isMember': 'Membro'
+            }
+        }
+
+        if (studentData.isStudent === 'true') {
+            if (memberData.isMember === 'true') {
+                return res.status(400).json({
+                    message: 'Um usuário não pode ser estudante e membro ao mesmo tempo',
+                    err: 'student-member-conflict'
+                })
+            }
+            fieldsConfig.required.push('student.studentClass')
+            fieldsConfig.labels['student.studentClass'] = 'Classe'
+        } else {
+            studentData.studentClass = null
+        }
+
+        if (memberData.isMember === 'true') {
+            if (studentData.isStudent === 'true') {
+                return res.status(400).json({
+                    message: 'Um usuário não pode ser membro e estudante ao mesmo tempo',
+                    err: 'member-student-conflict'
+                })
+            }
+            fieldsConfig.required.push('member.memberSince')
+            fieldsConfig.labels['member.memberSince'] = 'Data de entrada'
+            fieldsConfig.atLeastOne = ['email', 'phone']
+            fieldsConfig.labels.email = 'Email'
+            fieldsConfig.labels.phone = 'Telefone'
+        } else {
+            memberData.memberSince = null
+        }
+
+        if (memberData.isMember === 'false' && studentData.isStudent === 'false') {
+            return res.status(400).json({
+                message: 'Um usuário deve ser membro ou estudante',
+                err: 'member-student-conflict'
+            })
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        if (memberData.memberSince && memberData.memberSince.trim() !== '') {
+            // verifica se a data é válida
+            const dates = isDate({
+                dates: ['member.memberSince'],
+                labels: {
+                    'member.memberSince': 'Data de entrada'
+                }
+            })
+            const datesValidation = dates(req)
+            if (!datesValidation.valid) {
+                return res.status(datesValidation.status).json({
+                    message: datesValidation.message,
+                    err: datesValidation.err
+                })
+            }
+        }
+
+        // verifica se é estudante
+        const validBooleanFields = validateBooleanFields([
+            {
+                value: studentData.isStudent,
+                field: 'student.isStudent',
+                err: 'student-isStudent-not-valid'
+            },
+            {
+                value: memberData.isMember,
+                field: 'member.isMember',
+                err: 'member-isMember-not-valid'
+            }
+        ])
+
+        if (!validBooleanFields.valid) {
+            return res.status(400).json({
+                message: validBooleanFields.message,
+                err: validBooleanFields.err
+            })
+        }
+
+        let validMail = null
+        if (email && email.trim() !== '') {
+            // verifica se o email é valido
+            validMail = validateEmail(email)
+            if (!validMail.valid) {
+                return res.status(validMail.status).json({
+                    message: validMail.message,
+                    err: validMail.err
+                })
+            }
+        }
+
+        let validPhone = null
+        if (phone && phone.trim() !== '') {
+            // verifica se o telefone é valido
+            validPhone = validatePhone(phone)
+            if (!validPhone.valid) {
+                return res.status(validPhone.status).json({
+                    message: validPhone.message,
+                    err: validPhone.err
+                })
+            } 
+        }
+        
+        const result = await libraryService.updateMember({
+            id,
+            name,
+            email: validMail && validMail.email ? validMail.email : null,
+            phone: validPhone && validPhone.phone ? validPhone.phone : null,
+            student: studentData,
+            member: memberData,
+            observations,
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                member: result.member
+            })
+        }
+    }
+
+    static async deleteMember(req, res) {
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await libraryService.deleteMember({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                member: result.member
+            })
+        }
     }
 
 }

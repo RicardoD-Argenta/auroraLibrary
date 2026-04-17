@@ -12,7 +12,13 @@ module.exports = class UserController {
 
     // ------------------------ criação de usuário ------------------------ //
     static async register(req, res) {
-        emptyBody(req, res)
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
 
         const { name, login, password, confirmPassword, role } = req.body
 
@@ -29,8 +35,13 @@ module.exports = class UserController {
         }
 
         const reqFields = emptyFields(fieldsConfig)
-        const ok = reqFields(req, res)
-        if (!ok) return
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
 
         // verifica se o cargo é válido
         if (!['admin', 'librarian'].includes(role)) {
@@ -75,7 +86,13 @@ module.exports = class UserController {
     }
 
     static async login(req, res) {
-        emptyBody(req, res)
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
 
         const { login, password } = req.body
 
@@ -89,8 +106,13 @@ module.exports = class UserController {
         }
         
         let reqFields = emptyFields(fieldsConfig)
-        let ok = reqFields(req, res)
-        if (!ok) return
+        let fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
 
         const result = await userService.login({
             login, 
@@ -129,7 +151,13 @@ module.exports = class UserController {
 
     static async getUser(req, res) {
         const { id } = req.params
-        validateID(id, res)
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
 
         const userId = req.authenticatedUserId
         const userRole = req.authenticatedUserRole
@@ -153,11 +181,23 @@ module.exports = class UserController {
     }
 
     static async updateUser(req, res) {
-        emptyBody(req, res)
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
 
         const { id } = req.params
 
-        validateID(id, res)
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
 
         const userId = req.authenticatedUserId
         const userRole = req.authenticatedUserRole
@@ -192,8 +232,13 @@ module.exports = class UserController {
         }
         
         let reqFields = emptyFields(fieldsConfig)
-        let ok = reqFields(req, res)
-        if (!ok) return
+        let fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
 
         
 
@@ -222,7 +267,13 @@ module.exports = class UserController {
     static async deleteUser(req, res) {
         const { id } = req.params
 
-        validateID(id, res)
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
 
         const userId = req.authenticatedUserId
         const userRole = req.authenticatedUserRole

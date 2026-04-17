@@ -1,10 +1,16 @@
 const { ObjectId } = require('mongodb')
 
-const validateID = (id, res) => {
+const validateID = (id) => {
     if (!ObjectId.isValid(id)) {
-            res.status(400).json({ message: 'ID inválido' })
-            return
+            return {
+                valid: false,
+                status: 400,
+                message: 'ID inválido',
+                err: 'invalid-id'
+            }
     }
+
+    return { valid: true }
 }
 
 module.exports = validateID

@@ -13,7 +13,9 @@ const validatePhone = (phone) => {
   if (!validator.isMobilePhone(cleanPhone, 'pt-BR')) {
     return {
       valid: false,
-      message: 'Telefone inválido!'
+      status: 400,
+      message: 'Telefone inválido',
+      err: 'invalid-phone'
     }
   }
 
