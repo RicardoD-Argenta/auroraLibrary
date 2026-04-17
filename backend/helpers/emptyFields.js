@@ -1,5 +1,5 @@
 const emptyFields = (config) => {
-  return (req, res, next) => {
+  return (req) => {
     const {
       required = [],
       atLeastOne = [],
@@ -20,10 +20,12 @@ const emptyFields = (config) => {
 
     if (missing.length) {
       const missingLabels = missing.map(f => labels[f] || f)
-      res.status(422).json({
+      return {
+        valid: false,
+        status: 400,
         message: `Campos obrigatórios ausentes: ${missingLabels.join(', ')}`,
-      })
-      return false
+        err: 'required-fields-missing'
+      }
     }
 
     // Valida "pelo menos um"
@@ -37,13 +39,15 @@ const emptyFields = (config) => {
 
       if (!hasAtLeastOne) {
         const fieldLabels = atLeastOne.map(f => labels[f] || f)
-        res.status(400).json({
-          message: `Pelo menos um desses campos deve ser preenchido: ${fieldLabels.join(' ou ')}`
-        })
-        return false
+        return {
+          valid: false,
+          status: 400,
+          message: `Pelo menos um desses campos deve ser preenchido: ${fieldLabels.join(' ou ')}`,
+          err: 'at-least-one-field-required'
+        }
       }
     }
-    return true
+    return { valid: true }
   }
 }
 

@@ -9,6 +9,13 @@ const LibraryParams = mongoose.model(
             required: true
         },
         params: {
+            isSchool: {
+                active: {
+                    type: Boolean,
+                    required: true,
+                    default: false
+                }
+            },
             loanDelay: {
                 active: {
                     type: Boolean,
