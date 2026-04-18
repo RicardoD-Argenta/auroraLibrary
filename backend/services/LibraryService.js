@@ -2,6 +2,7 @@
 
 // models
 const Member = require('../models/Library/Member')
+const Sector = require('../models/Library/Sector')
 
 // helpers
 
@@ -181,6 +182,165 @@ module.exports = class LibraryService {
             return {
                 valid: false,
                 message: 'Erro ao deletar membro',
+                err: error.message
+            }
+        }
+    }
+
+
+    // ------------------------ criação de setores ------------------------ //
+    async registeredSector(sectorData) {
+        try {
+            const sector = await Sector.findOne({
+                $or: [
+                    { name: sectorData.name },
+                ], _id: { $ne: sectorData.id }
+            })
+            if (sector) {
+                return {
+                    valid: false,
+                    message: 'Setor já cadastrado',
+                    err: 'sector-already-registered'
+                }
+            }
+        }
+        catch (error) {
+            console.log(error)
+            return {
+                valid: false,
+                message: 'Erro ao verificar setor',
+                err: error.message
+            }
+        }
+    }
+
+    async existingSector(sectorData) {
+        try {
+            const sector = await Sector.findById(sectorData.id)
+            if (!sector) {
+                return {
+                    valid: false,
+                    message: 'Setor não cadastrado',
+                    err: 'sector-not-registered'
+                }
+            }
+            return {
+                valid: true,
+                sector
+            }
+        } catch (error) {
+            console.log(error)
+            return {
+                valid: false,
+                message: 'Erro ao verificar setor',
+                err: error.message
+            }
+        }
+    }
+
+    async registerSector(sectorData) {
+        // verifica se o setor já está cadastrado
+        const registeredSector = await this.registeredSector(sectorData)
+        if (registeredSector && !registeredSector.valid) {
+            return registeredSector
+        }
+
+        try {
+            const sector = new Sector({
+                name: sectorData.name,
+                description: sectorData.description
+            })
+            const newSector = await sector.save()
+            return {
+                valid: true,
+                message: 'Setor cadastrado com sucesso',
+                sector: newSector
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao cadastrar setor',
+                err: error.message
+            }
+        }
+    }
+
+    async getAllSectors() {
+        try {
+            const sectors = await Sector.find()
+            return {
+                valid: true,
+                sectors
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar setores',
+                err: error.message
+             }
+        }
+    }
+
+    async getSector(sectorData) {
+        const existingSector = await this.existingSector(sectorData)
+        if (existingSector && !existingSector.valid) {
+            return existingSector
+        }
+        return {
+            valid: true,
+            sector: existingSector.sector
+        }
+    }
+
+    async updateSector(sectorData) {
+        const existingSector = await this.existingSector(sectorData)
+        if (existingSector && !existingSector.valid) {
+            return existingSector
+        }
+
+        const sector = existingSector.sector
+        sector.set({
+            name: sectorData.name,
+            description: sectorData.description
+        })
+
+        const registeredSector = await this.registeredSector(sectorData)
+        if (registeredSector && !registeredSector.valid) {
+            return registeredSector
+        }
+
+        try {
+            const updatedSector = await sector.save()
+            return {
+                valid: true,
+                message: 'Setor atualizado com sucesso',
+                sector: updatedSector
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar setor',
+                err: error.message
+             }
+        }
+    }
+
+    async deleteSector(sectorData) {
+        const existingSector = await this.existingSector(sectorData)
+        if (existingSector && !existingSector.valid) {
+            return existingSector
+        }
+
+        try {
+            await Sector.findByIdAndDelete(sectorData.id)
+            return {
+                valid: true,
+                message: 'Setor deletado com sucesso'
+             }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao deletar setor',
                 err: error.message
             }
         }

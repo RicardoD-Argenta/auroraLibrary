@@ -6,10 +6,18 @@ const verifyToken = require('../helpers/verify-token')
 
 // ------------------------ routes ------------------------ //
 
+// member
 router.post('/member/register', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.registerMember)
 router.get('/member/all', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getAllMembers)
 router.get('/member/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getMember)
 router.patch('/member/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.updateMember)
 router.delete('/member/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.deleteMember)
+
+// Sector
+router.post('/sector/register', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.registerSector)
+router.get('/sector/all', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getAllSectors)
+router.get('/sector/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getSector)
+router.patch('/sector/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.updateSector)
+router.delete('/sector/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.deleteSector)
 
 module.exports = router
