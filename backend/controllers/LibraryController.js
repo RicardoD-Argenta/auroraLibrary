@@ -573,4 +573,176 @@ module.exports = class LibraryController {
         }
     }
 
+
+    // ------------------------ criação de setores ------------------------ //
+    static async registerShelf(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { name, description } = req.body
+
+        // verifica os campos obrigatórios
+        const fieldsConfig = {
+            required: ['name'],
+            labels: {
+                name: 'Nome',
+                description: 'Descrição'
+            }
+        }
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        const result = await libraryService.registerShelf({
+            name,
+            description
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                shelf: result.shelf
+            })
+        }
+    }
+
+    static async getAllShelves(req, res) {
+        const result = await libraryService.getAllShelves()
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                shelves: result.shelves
+            })
+        }
+    }
+
+    static async getShelf(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await libraryService.getShelf({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                shelf: result.shelf
+            })
+        }
+    }
+
+    static async updateShelf(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { name, description } = req.body
+
+        // verifica os campos obrigatórios
+        const fieldsConfig = {
+            required: ['name'],
+            labels: {
+                name: 'Nome',
+                description: 'Descrição'
+            }
+        }
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        const result = await libraryService.updateShelf({
+            id,
+            name,
+            description
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                shelf: result.shelf
+            })
+        }
+    }
+
+    static async deleteShelf(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await libraryService.deleteShelf({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                shelf: result.shelf
+            })
+        }
+    }
+
 }
