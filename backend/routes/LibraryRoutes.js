@@ -20,4 +20,11 @@ router.get('/sector/:id', verifyToken({ role: ['admin', 'librarian'] }), Library
 router.patch('/sector/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.updateSector)
 router.delete('/sector/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.deleteSector)
 
+// Shelf
+router.post('/shelf/register', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.registerShelf)
+router.get('/shelf/all', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getAllShelves)
+router.get('/shelf/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getShelf)
+router.patch('/shelf/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.updateShelf)
+router.delete('/shelf/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.deleteShelf)
+
 module.exports = router

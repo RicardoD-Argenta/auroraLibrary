@@ -3,6 +3,7 @@
 // models
 const Member = require('../models/Library/Member')
 const Sector = require('../models/Library/Sector')
+const Shelf = require('../models/Library/Shelf')
 
 // helpers
 
@@ -341,6 +342,166 @@ module.exports = class LibraryService {
             return {
                 valid: false,
                 message: 'Erro ao deletar setor',
+                err: error.message
+            }
+        }
+    }
+
+
+    // ------------------------ criação de setores ------------------------ //
+    async registeredShelf(shelfData) {
+        try {
+            const shelf = await Shelf.findOne({
+                $or: [
+                    { name: shelfData.name },
+                ], _id: { $ne: shelfData.id }
+            })
+            if (shelf) {
+                return {
+                    valid: false,
+                    message: 'Estante já cadastrada',
+                    err: 'shelf-already-registered'
+                }
+            }
+        }
+        catch (error) {
+            console.log(error)
+            return {
+                valid: false,
+                message: 'Erro ao verificar estante',
+                err: error.message
+            }
+        }
+    }
+
+    async existingShelf(shelfData) {
+        try {
+            const shelf = await Shelf.findById(shelfData.id)
+            if (!shelf) {
+                return {
+                    valid: false,
+                    message: 'Estante não cadastrada',
+                    err: 'shelf-not-registered'
+                }
+            }
+            return {
+                valid: true,
+                shelf
+            }
+        } catch (error) {
+            console.log(error)
+            return {
+                valid: false,
+                message: 'Erro ao verificar estante',
+                err: error.message
+            }
+        }
+    }
+
+    async registerShelf(shelfData) {
+        const registeredShelf = await this.registeredShelf(shelfData)
+        if (registeredShelf && !registeredShelf.valid) {
+            return registeredShelf
+        }
+
+        try {
+            const shelf = new Shelf({
+                name: shelfData.name,
+                description: shelfData.description
+            })
+            const newShelf = await shelf.save()
+            return {
+                valid: true,
+                message: 'Estante cadastrada com sucesso',
+                shelf: newShelf
+            }
+        }
+        catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao cadastrar estante',
+                err: error.message
+            }
+        }
+    }
+
+    async getAllShelves() {
+        try {
+            const shelves = await Shelf.find()
+            return {
+                valid: true,
+                shelves
+            }
+        }
+        catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar estantes',
+                err: error.message
+             }
+        }
+    }
+
+    async getShelf(shelfData) {
+        const existingShelf = await this.existingShelf(shelfData)
+        if (existingShelf && !existingShelf.valid) {
+            return existingShelf
+        }
+        return {
+            valid: true,
+            shelf: existingShelf.shelf
+        }
+    }
+
+    async updateShelf(shelfData) {
+        const existingShelf = await this.existingShelf(shelfData)
+        if (existingShelf && !existingShelf.valid) {
+            return existingShelf
+        }
+
+        const shelf = existingShelf.shelf
+        shelf.set({
+            name: shelfData.name,
+            description: shelfData.description
+        })
+
+        const registeredShelf = await this.registeredShelf(shelfData)
+        if (registeredShelf && !registeredShelf.valid) {
+            return registeredShelf
+        }
+
+        try {
+            const updatedShelf = await shelf.save()
+            return {
+                valid: true,
+                message: 'Estante atualizado com sucesso',
+                shelf: updatedShelf
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar estante',
+                err: error.message
+             }
+        }
+    }
+
+    async deleteShelf(shelfData) {
+        const existingShelf = await this.existingShelf(shelfData)
+        if (existingShelf && !existingShelf.valid) {
+            return existingShelf
+        }
+
+        try {
+            await Shelf.findByIdAndDelete(shelfData.id)
+            return {
+                valid: true,
+                message: 'Estante deletado com sucesso'
+             }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao deletar estante',
                 err: error.message
             }
         }
