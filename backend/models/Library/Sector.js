@@ -10,11 +10,11 @@ const Sector = mongoose.model(
             maxlength: 255,
             required: true,
         },
-        libraryId: {
-            type: Schema.Types.ObjectId,
-            ref: 'Library',
-            required: true
-        }
+        description: {
+            type: String,
+            maxlength: 255,
+            sparse: true,
+        },
     },
     { timestamps: true }
     )
