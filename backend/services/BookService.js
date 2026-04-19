@@ -1,5 +1,6 @@
 // models
     const Publisher = require('../models/Book/Publisher')
+    const Author = require('../models/Book/Author')
 
 // helpers
 
@@ -115,6 +116,11 @@ module.exports = class BookService {
             return existingPublisher
         }
 
+        const registeredPublisher = await this.registeredPublisher(publisherData)
+        if (registeredPublisher && !registeredPublisher.valid) {
+            return registeredPublisher
+        }
+
         const publisher = existingPublisher.publisher
         publisher.set({
             name: publisherData.name
@@ -157,4 +163,159 @@ module.exports = class BookService {
             }
         }
     }
+
+    // ------------------------ criação de autores ------------------------ //
+    async registeredAuthor(authorData) {
+        try {
+            const author = await Author.findOne({
+                $or: [
+                    { name: authorData.name },
+                ], _id: { $ne: authorData.id }
+            })
+            if (author) {
+                return {
+                    valid: false,
+                    message: 'Autor já cadastrado',
+                    err: 'author-already-registered'
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            return {
+                valid: false,
+                message: 'Erro ao verificar autor',
+                err: error.message
+            }
+        }
+    }
+
+    async existingAuthor(authorData) {
+        try {
+            const author = await Author.findById(authorData.id)
+            if (!author) {
+                return {
+                    valid: false,
+                    message: 'Autor não cadastrado',
+                    err: 'author-not-registered'
+                }
+            }
+            return {
+                valid: true,
+                author
+            }
+        } catch (error) {
+            console.log(error)
+            return {
+                valid: false,
+                message: 'Erro ao verificar autor',
+                err: error.message
+            }
+        }
+    }
+
+    async registerAuthor(authorData) {
+        const registeredAuthor = await this.registeredAuthor(authorData)
+        if (registeredAuthor && !registeredAuthor.valid) {
+            return registeredAuthor
+        }
+
+        const author = new Author({
+            name: authorData.name
+        })
+        try {
+            const newAuthor = await author.save()
+            return {
+                valid: true,
+                message: 'Autor cadastrado com sucesso',
+                author: newAuthor
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao cadastrar autor',
+                err: error.message
+            }
+        }
+    }
+
+    async getAllAuthors() {
+        try {
+            const authors = await Author.find()
+            return {
+                valid: true,
+                authors
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar autores',
+                err: error.message
+             }
+        }
+    }
+
+    async getAuthor(authorData) {
+        const existingAuthor = await this.existingAuthor(authorData)
+        if (existingAuthor && !existingAuthor.valid) {
+            return existingAuthor
+        }
+        return {
+            valid: true,
+            author: existingAuthor.author
+        }
+    }
+
+    async editAuthor(authorData) {
+        const existingAuthor = await this.existingAuthor(authorData)
+        if (existingAuthor && !existingAuthor.valid) {
+            return existingAuthor
+        }
+
+        const registeredAuthor = await this.registeredAuthor(authorData)
+        if (registeredAuthor && !registeredAuthor.valid) {
+            return registeredAuthor
+        }
+
+        const author = existingAuthor.author
+        author.set({
+            name: authorData.name
+        })
+
+        try {
+            const updatedAuthor = await author.save()
+            return {
+                valid: true,
+                message: 'Autor atualizado com sucesso',
+                author: updatedAuthor
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar autor',
+                err: error.message
+             }
+        }
+    }
+
+    async deleteAuthor(authorData) {
+        const existingAuthor = await this.existingAuthor(authorData)
+        if (existingAuthor && !existingAuthor.valid) {
+            return existingAuthor
+        }
+
+        try {
+            await Author.findByIdAndDelete(existingAuthor.author._id)
+            return {
+                valid: true,
+                message: 'Autor excluído com sucesso'
+             }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao excluir autor',
+                err: error.message
+            }
+        }
+    }
+
 }
