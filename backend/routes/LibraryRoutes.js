@@ -27,4 +27,8 @@ router.get('/shelf/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryC
 router.patch('/shelf/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.updateShelf)
 router.delete('/shelf/:id', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.deleteShelf)
 
+// Library
+router.get('/library', verifyToken({ role: ['admin', 'librarian'] }), LibraryController.getLibrary)
+router.patch('/library', verifyToken({ role: ['admin'] }), LibraryController.updateLibrary)
+
 module.exports = router

@@ -10,6 +10,7 @@ const validateBooleanFields = require('../helpers/validateBooleanFields') // ver
 const validateEmail = require('../helpers/validateEmail') // verifica se o email é válido
 const validatePhone = require('../helpers/validatePhone') // verifica se o telefone é válido
 const isDate = require('../helpers/isDate') // verifica se a data é válida
+const validator = require('validator')
 
 module.exports = class LibraryController {
 
@@ -304,7 +305,7 @@ module.exports = class LibraryController {
             }
         }
 
-        // verifica se é estudante
+        // verifica se é booleano
         const validBooleanFields = validateBooleanFields([
             {
                 value: studentData.isStudent,
@@ -743,6 +744,133 @@ module.exports = class LibraryController {
                 shelf: result.shelf
             })
         }
+    }
+
+    // ------------------------ Leitura e Edição de Bibliotecas ------------------------ //
+    static async getLibrary(req, res) {
+        const result = await libraryService.getLibrary()
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                library: result.library
+            })
+        }
+    }
+
+    static async updateLibrary(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { params, name } = req.body
+        const paramsData = params ?? {}
+        const isSchoolData = paramsData.isSchool ?? {}
+        const loanDelayData = paramsData.loanDelay ?? {}
+
+        const fieldsConfig = {
+            required: ['name', 'params.isSchool.active', 'params.loanDelay.active'],
+            labels: {
+                name: 'Nome da biblioteca',
+                'params.isSchool.active': 'Paramêtro que verifica se é uma escola',
+                'params.loanDelay.active': 'Paramêtro que verifica se é aplicado multas',
+            }
+        }
+
+        if (loanDelayData.active === 'true') {
+            fieldsConfig.required.push('params.loanDelay.dailyRate', 'params.loanDelay.fineValue')
+            fieldsConfig.labels['params.loanDelay.fineValue'] = 'Valor fixo da multa'
+            fieldsConfig.labels['params.loanDelay.dailyRate'] = 'Valor diário da multa'
+        } else {
+            loanDelayData.dailyRate = null
+            loanDelayData.fineValue = null
+        }
+
+        if (loanDelayData.active === 'true') {
+            if (!validator.isFloat(loanDelayData.dailyRate)) {
+                return res.status(400).json({
+                    message: 'Valor diário da multa inválido',
+                    err: 'dailyRate-not-valid'
+                })
+            }
+            if (loanDelayData.dailyRate < 0 || loanDelayData.dailyRate > 100) {
+                return res.status(400).json({
+                    message: 'Valor diário do juros da multa deve ser entre 0 e 100%',
+                    err: 'dailyRate-not-valid'
+                })
+            }
+            if (!validator.isFloat(loanDelayData.fineValue)) {
+                return res.status(400).json({
+                    message: 'Valor fixo da multa inválido',
+                    err: 'fineValue-not-valid'
+                })
+            }
+            if (loanDelayData.fineValue < 0) {
+                return res.status(400).json({
+                    message: 'Valor fixo da multa deve ser positivo',
+                    err: 'fineValue-not-valid'
+                })
+            }
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        const validBooleanFields = validateBooleanFields([
+            {
+                value: isSchoolData.active,
+                field: 'params.isSchool.active',
+                err: 'isSchool-active-not-valid'
+            },
+            {
+                value: loanDelayData.active,
+                field: 'params.loanDelay.active',
+                err: 'loanDelay-active-not-valid'
+            }
+        ])
+
+        if (!validBooleanFields.valid) {
+            return res.status(400).json({
+                message: validBooleanFields.message,
+                err: validBooleanFields.err
+            })
+        }
+
+        const result = await libraryService.updateLibrary({
+            name,
+            params: {
+                ...paramsData,
+                isSchool: isSchoolData,
+                loanDelay: loanDelayData
+            }
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                library: result.library,
+                libraryParams: result.libraryParams
+            })
+        }
+
     }
 
 }

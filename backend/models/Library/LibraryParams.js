@@ -4,10 +4,6 @@ const { Schema } = mongoose
 const LibraryParams = mongoose.model(
     'LibraryParams',
     new Schema({
-        libraryId: {
-            type: Schema.Types.ObjectId,
-            required: true
-        },
         params: {
             isSchool: {
                 active: {

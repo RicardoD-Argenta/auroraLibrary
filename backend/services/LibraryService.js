@@ -4,6 +4,8 @@
 const Member = require('../models/Library/Member')
 const Sector = require('../models/Library/Sector')
 const Shelf = require('../models/Library/Shelf')
+const Library = require('../models/Library/Library')
+const LibraryParams = require('../models/Library/LibraryParams')
 
 // helpers
 
@@ -504,6 +506,51 @@ module.exports = class LibraryService {
                 message: 'Erro ao deletar estante',
                 err: error.message
             }
+        }
+    }
+
+    // ------------------------ Leitura e Edição de Bibliotecas ------------------------ //
+    async getLibrary() {
+        try {
+            const library = await Library.findOne()
+            return {
+                valid: true,
+                library
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar biblioteca',
+                err: error.message
+             }
+        }
+    }
+
+    async updateLibrary(libraryData) {
+        const library = await Library.findOne()
+        const libraryParams = await LibraryParams.findOne()
+        library.set({
+            name: libraryData.name,
+        })
+        libraryParams.set({
+            params: libraryData.params
+        })
+
+        try {
+            const updatedLibrary = await library.save()
+            const updatedLibraryParams = await libraryParams.save()
+            return {
+                valid: true,
+                message: 'Biblioteca atualizada com sucesso',
+                library: updatedLibrary,
+                libraryParams: updatedLibraryParams
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar biblioteca',
+                err: error.message
+             }
         }
     }
 
