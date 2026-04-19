@@ -15,14 +15,14 @@ const validateObjectIds = (config) => {
             if (Array.isArray(value)) {
                 const invalid = value.some(id => !ObjectId.isValid(id))
                 if (invalid) {
-                    res.status(400).json({ message: `${labels[field] || field} contém IDs inválidos` })
+                    res.status(400).json({ message: `${labels[field] || field} contém IDs inválidos` , err: 'invalid-array-of-ids' })
                     return false
                 }
                 continue
             }
 
             if (!ObjectId.isValid(value)) {
-                res.status(400).json({ message: `${labels[field] || field} inválido` })
+                res.status(400).json({ message: `${labels[field] || field} inválido` , err: 'invalid-id' })
                 return false
             }
         }

@@ -11,7 +11,10 @@ const validateEmail = require('../helpers/validateEmail') // verifica se o email
 const validatePhone = require('../helpers/validatePhone') // verifica se o telefone é válido
 const isDate = require('../helpers/isDate') // verifica se a data é válida
 const validateObjectIds = require('../helpers/validateObjectIds') // verifica se os IDs são válidos
+const validateYear = require('../helpers/validateYear') // verifica se o ano é válido
+const validateISBN = require('../helpers/validateISBN') // verifica se o ISBN é válido
 const validator = require('validator')
+const { validate } = require('../models/Book/Publisher')
 
 module.exports = class BookController {
     // ------------------------ criação de editora ------------------------ //
@@ -539,6 +542,279 @@ module.exports = class BookController {
             return res.status(200).json({
                 message: result.message,
                 genre: result.genre
+            })
+        }
+    }
+
+
+    // ------------------------ criação de livro ------------------------ //
+    static async registerBook(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+        
+        const { title, subtitle, authorsId, publisherId, genresId, language, isbn, edition, year, pages, description, coverUrl } = req.body
+
+        const fieldsConfig = {
+            required: ['title', 'authorsId', 'publisherId', 'genresId', 'language', 'isbn', 'year', 'pages'],
+            labels: {
+                title: 'Título',
+                subtitle: 'Subtítulo',
+                authorsId: 'ID do(s) autor(es)',
+                publisherId: 'ID da editora',
+                genresId: 'ID do(s) gênero(s)',
+                language: 'Idioma',
+                isbn: 'ISBN',
+                edition: 'Edição',
+                year: 'Ano',
+                pages: 'Páginas',
+                description: 'Descrição',
+                coverUrl: 'URL da imagem/capa'
+            }
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        // verifica se os IDs são válidos
+        const objectIdValidation = validateObjectIds({
+            objects: ['authorsId', 'publisherId', 'genresId'],
+            labels: {
+                authorsId: 'ID do(s) autor(es)',
+                publisherId: 'ID da editora',
+                genresId: 'ID do(s) gênero(s)'
+            }
+        })
+        const okIds = objectIdValidation(req, res)
+        if (!okIds) return
+
+        // verifica se o ano é válido
+        const resultYear = validateYear(year)
+        if (!resultYear.valid) {
+            return res.status(400).json({ message: resultYear.message, err: resultYear.err })
+        }
+
+        // verifica se o ISBN é válido
+        const resultISBN = validateISBN(isbn)
+        if (!resultISBN.valid) {
+            return res.status(400).json({ message: resultISBN.message, err: resultISBN.err })
+        }
+
+        const verifPages = parseInt(pages)
+        // verifica se a quantidade de páginas é válida
+        if (isNaN(verifPages) || verifPages <= 0) {
+            return res.status(400).json({ message: 'Número de páginas inválido', err: 'invalid-pages' })
+        }
+        
+
+        const result = await bookService.registerBook({
+            title,
+            subtitle,
+            authorsId,
+            publisherId,
+            genresId,
+            language,
+            isbn,
+            edition,
+            year,
+            pages,
+            description,
+            coverUrl
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                book: result.book
+            })
+        }
+    }
+
+    static async getAllBooks(req, res) {
+        const result = await bookService.getAllBooks()
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                books: result.books
+            })
+        }
+    }
+
+    static async getBook(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+        const result = await bookService.getBook({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                book: result.book
+            })
+        }
+    }
+
+    static async editBook(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { title, subtitle, authorsId, publisherId, genresId, language, isbn, edition, year, pages, description, coverUrl } = req.body
+
+        const fieldsConfig = {
+            required: ['title', 'authorsId', 'publisherId', 'genresId', 'language', 'isbn', 'year', 'pages'],
+            labels: {
+                title: 'Título',
+                subtitle: 'Subtítulo',
+                authorsId: 'ID do(s) autor(es)',
+                publisherId: 'ID da editora',
+                genresId: 'ID do(s) gênero(s)',
+                language: 'Idioma',
+                isbn: 'ISBN',
+                edition: 'Edição',
+                year: 'Ano',
+                pages: 'Páginas',
+                description: 'Descrição',
+                coverUrl: 'URL da imagem/capa'
+            }
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        // verifica se os IDs são válidos
+        const objectIdValidation = validateObjectIds({
+            objects: ['authorsId', 'publisherId', 'genresId'],
+            labels: {
+                authorsId: 'ID do(s) autor(es)',
+                publisherId: 'ID da editora',
+                genresId: 'ID do(s) gênero(s)'
+            }
+        })
+        const okIds = objectIdValidation(req, res)
+        if (!okIds) return
+
+        // verifica se o ano é válido
+        const resultYear = validateYear(year)
+        if (!resultYear.valid) {
+            return res.status(400).json({ message: resultYear.message, err: resultYear.err })
+        }
+
+        // verifica se o ISBN é válido
+        const resultISBN = validateISBN(isbn)
+        if (!resultISBN.valid) {
+            return res.status(400).json({ message: resultISBN.message, err: resultISBN.err })
+        }
+
+        const verifPages = parseInt(pages)
+        // verifica se a quantidade de páginas é válida
+        if (isNaN(verifPages) || verifPages <= 0) {
+            return res.status(400).json({ message: 'Número de páginas inválido', err: 'invalid-pages' })
+        }
+        
+
+        const result = await bookService.editBook({
+            id,
+            title,
+            subtitle,
+            authorsId,
+            publisherId,
+            genresId,
+            language,
+            isbn,
+            edition,
+            year,
+            pages,
+            description,
+            coverUrl
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                book: result.book
+            })
+        }
+    }
+
+    static async deleteBook(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await bookService.deleteBook({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                book: result.book
             })
         }
     }

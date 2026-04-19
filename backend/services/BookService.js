@@ -2,6 +2,7 @@
     const Publisher = require('../models/Book/Publisher')
     const Author = require('../models/Book/Author')
     const Genre = require('../models/Book/Genre')
+    const Book = require('../models/Book/Book')
 
 // helpers
 
@@ -500,6 +501,241 @@ module.exports = class BookService {
             return {
                 valid: false,
                 message: 'Erro ao excluir gênero',
+                err: error.message
+            }
+        }
+    }
+
+
+    // ------------------------ criação de livro ------------------------ //
+    async registeredBook(bookData) {
+        try {
+            const book = await Book.findOne({
+                $or: [
+                    { title: bookData.title },
+                    { isbn: bookData.isbn },
+                ], _id: { $ne: bookData.id }
+            })
+            if (book) {
+                return {
+                    valid: false,
+                    message: 'Livro já cadastrado',
+                    err: 'book-already-registered'
+                }
+            }
+            else {
+                return {
+                    valid: true,
+                    book
+                }
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar livro',
+                err: error.message
+            }
+        }
+    }
+
+    async existingBook(bookData) {
+        try {
+            const book = await Book.findById(bookData.id)
+            if (!book) {
+                return {
+                    valid: false,
+                    message: 'Livro não cadastrado',
+                    err: 'book-not-registered'
+                }
+            }
+            else {
+                return {
+                    valid: true,
+                    book
+                }
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar livro',
+                err: error.message
+            }
+        }
+    }
+
+    async registerBook(bookData) {
+        const registeredBook = await this.registeredBook(bookData)
+        if (registeredBook && !registeredBook.valid) {
+            return registeredBook
+        }
+
+        const publisher = await this.existingPublisher({
+            id: bookData.publisherId
+        })
+        if (publisher && !publisher.valid) {
+            return publisher
+        }
+
+        for (const authorId of bookData.authorsId) {
+            const author = await this.existingAuthor({
+                id: authorId
+            })
+            if (author && !author.valid) {
+                return author
+            }
+        }
+        
+        for (const genreId of bookData.genresId) {
+            const genre = await this.existingGenre({
+                id: genreId
+            })
+            if (genre && !genre.valid) {
+                return genre
+            }
+        }
+
+        const book = new Book({
+            title: bookData.title,
+            subtitle: bookData.subtitle,
+            authorsId: bookData.authorsId,
+            publisherId: bookData.publisherId,
+            genresId: bookData.genresId,
+            language: bookData.language,
+            isbn: bookData.isbn,
+            edition: bookData.edition,
+            year: bookData.year,
+            pages: bookData.pages,
+            description: bookData.description,
+            coverUrl: bookData.coverUrl
+        })
+
+        try {
+            const newBook = await book.save()
+            return {
+                valid: true,
+                message: 'Livro cadastrado com sucesso',
+                book: newBook
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao cadastrar o livro',
+                err: error.message
+            }
+        }
+    }
+
+    async getAllBooks() {
+        try {
+            const books = await Book.find()
+            return {
+                valid: true,
+                books
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar os livros',
+                err: error.message
+             }
+        }
+    }
+
+    async getBook(bookData) {
+        const existingBook = await this.existingBook(bookData)
+        if (existingBook && !existingBook.valid) {
+            return existingBook
+        }
+        return {
+            valid: true,
+            book: existingBook.book
+        }
+    }
+
+    async editBook(bookData) {
+        const existingBook = await this.existingBook(bookData)
+        if (existingBook && !existingBook.valid) {
+            return existingBook
+        }
+
+        const registeredBook = await this.registeredBook(bookData)
+        if (registeredBook && !registeredBook.valid) {
+            return registeredBook
+        }
+
+        const publisher = await this.existingPublisher({
+            id: bookData.publisherId
+        })
+        if (publisher && !publisher.valid) {
+            return publisher
+        }
+
+        for (const authorId of bookData.authorsId) {
+            const author = await this.existingAuthor({
+                id: authorId
+            })
+            if (author && !author.valid) {
+                return author
+            }
+        }
+        
+        for (const genreId of bookData.genresId) {
+            const genre = await this.existingGenre({
+                id: genreId
+            })
+            if (genre && !genre.valid) {
+                return genre
+            }
+        }
+
+        const book = existingBook.book
+        book.set({
+            title: bookData.title,
+            subtitle: bookData.subtitle,
+            authorsId: bookData.authorsId,
+            publisherId: bookData.publisherId,
+            genresId: bookData.genresId,
+            language: bookData.language,
+            isbn: bookData.isbn,
+            edition: bookData.edition,
+            year: bookData.year,
+            pages: bookData.pages,
+            description: bookData.description,
+            coverUrl: bookData.coverUrl
+        })
+
+        try {
+            const updatedBook = await book.save()
+            return {
+                valid: true,
+                message: 'Livro atualizado com sucesso',
+                book: updatedBook
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar o livro',
+                err: error.message
+            }
+        }
+    }
+
+    async deleteBook(bookData) {
+        const existingBook = await this.existingBook(bookData)
+        if (existingBook && !existingBook.valid) {
+            return existingBook
+        }
+
+        try {
+            await Book.findByIdAndDelete(existingBook.book._id)
+            return {
+                valid: true,
+                message: 'Livro excluído com sucesso'
+             }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao excluir o livro',
                 err: error.message
             }
         }
