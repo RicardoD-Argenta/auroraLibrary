@@ -20,4 +20,11 @@ router.get('/author/:id', verifyToken({ role: ['admin', 'librarian'] }), BookCon
 router.patch('/author/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.editAuthor)
 router.delete('/author/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.deleteAuthor)
 
+// genre
+router.post('/genre/register', verifyToken({ role: ['admin', 'librarian'] }), BookController.registerGenre)
+router.get('/genre/all', verifyToken({ role: ['admin', 'librarian'] }), BookController.getAllGenres)
+router.get('/genre/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.getGenre)
+router.patch('/genre/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.editGenre)
+router.delete('/genre/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.deleteGenre)
+
 module.exports = router

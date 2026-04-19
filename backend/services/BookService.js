@@ -1,11 +1,21 @@
 // models
     const Publisher = require('../models/Book/Publisher')
     const Author = require('../models/Book/Author')
+    const Genre = require('../models/Book/Genre')
 
 // helpers
 
 
 module.exports = class BookService {
+
+    normalizeOptionalObjectId(value) {
+        if (typeof value !== 'string') {
+            return value || null
+        }
+
+        const trimmedValue = value.trim()
+        return trimmedValue || null
+    }
 
     async registeredPublisher(publisherData) {
         try {
@@ -313,6 +323,183 @@ module.exports = class BookService {
             return {
                 valid: false,
                 message: 'Erro ao excluir autor',
+                err: error.message
+            }
+        }
+    }
+
+
+    // ------------------------ criação de gênero ------------------------ //
+    async registeredGenre(genreData) {
+        try {
+            const genre = await Genre.findOne({
+                $or: [
+                    { name: genreData.name },
+                ], _id: { $ne: genreData.id }
+            })
+            if (genre) {
+                return {
+                    valid: false,
+                    message: 'Gênero já cadastrado',
+                    err: 'genre-already-registered'
+                }
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar gênero',
+                err: error.message
+            }
+        }
+    }
+
+    async existingGenre(genreData) {
+        try {
+            const genre = await Genre.findById(genreData.id)
+            if (!genre) {
+                return {
+                    valid: false,
+                    message: 'Gênero não cadastrado',
+                    err: 'genre-not-registered'
+                }
+            }
+            return {
+                valid: true,
+                genre
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar gênero',
+                err: error.message
+            }
+        }
+    }
+
+    async registerGenre(genreData) {
+        const parentId = this.normalizeOptionalObjectId(genreData.parentId)
+
+        const registeredGenre = await this.registeredGenre(genreData)
+        if (registeredGenre && !registeredGenre.valid) {
+            return registeredGenre
+        }
+
+        if (parentId) {
+            const existingGenre = await this.existingGenre({
+                id: parentId
+            })
+            if (existingGenre && !existingGenre.valid) {
+                return existingGenre
+            }
+        }
+
+        const genre = new Genre({
+            name: genreData.name,
+            parentId
+        })
+        try {
+            const newGenre = await genre.save()
+            return {
+                valid: true,
+                message: 'Gênero cadastrado com sucesso',
+                genre: newGenre
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao cadastrar gênero',
+                err: error.message
+            }
+        }
+    }
+
+    async getAllGenres() {
+        try {
+            const genres = await Genre.find()
+            return {
+                valid: true,
+                genres
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar gêneros',
+                err: error.message
+             }
+        }
+    }
+
+    async getGenre(genreData) {
+        const existingGenre = await this.existingGenre(genreData)
+        if (existingGenre && !existingGenre.valid) {
+            return existingGenre
+        }
+        return {
+            valid: true,
+            genre: existingGenre.genre
+        }
+    }
+
+    async editGenre(genreData) {
+        const parentId = this.normalizeOptionalObjectId(genreData.parentId)
+
+        const existingGenre = await this.existingGenre(genreData)
+        if (existingGenre && !existingGenre.valid) {
+            return existingGenre
+        }
+
+        const registeredGenre = await this.registeredGenre(genreData)
+        if (registeredGenre && !registeredGenre.valid) {
+            return registeredGenre
+        }
+
+        if (parentId) {
+            const existingGenreParent = await this.existingGenre({
+                id: parentId
+            })
+            if (existingGenreParent && !existingGenreParent.valid) {
+                return existingGenreParent
+            }
+        }
+
+        const genre = existingGenre.genre
+        genre.set({
+            name: genreData.name,
+            parentId
+        })
+
+        try {
+            const updatedGenre = await genre.save()
+            return {
+                valid: true,
+                message: 'Gênero atualizado com sucesso',
+                genre: updatedGenre
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar gênero',
+                err: error.message
+             }
+        }
+    }
+
+    async deleteGenre(genreData) {
+        const existingGenre = await this.existingGenre(genreData)
+        if (existingGenre && !existingGenre.valid) {
+            return existingGenre
+        }
+
+        try {
+            await Genre.findByIdAndDelete(existingGenre.genre._id)
+            return {
+                valid: true,
+                message: 'Gênero excluído com sucesso'
+             }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao excluir gênero',
                 err: error.message
             }
         }
