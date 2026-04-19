@@ -10,6 +10,7 @@ const validateBooleanFields = require('../helpers/validateBooleanFields') // ver
 const validateEmail = require('../helpers/validateEmail') // verifica se o email é válido
 const validatePhone = require('../helpers/validatePhone') // verifica se o telefone é válido
 const isDate = require('../helpers/isDate') // verifica se a data é válida
+const validateObjectIds = require('../helpers/validateObjectIds') // verifica se os IDs são válidos
 const validator = require('validator')
 
 module.exports = class BookController {
@@ -342,6 +343,202 @@ module.exports = class BookController {
             return res.status(200).json({
                 message: result.message,
                 author: result.author
+            })
+        }
+    }
+
+
+    // ------------------------ criação de gênero ------------------------ //
+    static async registerGenre(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { name, parentId } = req.body
+        const normalizedParentId = typeof parentId === 'string' ? parentId.trim() : parentId
+        const sanitizedParentId = normalizedParentId || null
+
+        const fieldsConfig = {
+            required: ['name'],
+            labels: {
+                name: 'Nome',
+            }
+        }
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        if (sanitizedParentId) {
+            const objectIdValidation = validateObjectIds({
+                objects: ['parentId'],
+                labels: {
+                    parentId: 'ID do gênero pai'
+                }
+            })
+            req.body.parentId = sanitizedParentId
+            const objectIdsValidation = objectIdValidation(req, res)
+            if (!objectIdsValidation) return
+        }
+
+        const result = await bookService.registerGenre({
+            name,
+            parentId: sanitizedParentId
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                genre: result.genre
+            })
+        }
+    }
+
+    static async getAllGenres(req, res) {
+        const result = await bookService.getAllGenres()
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                genres: result.genres
+            })
+        }
+    }
+
+    static async getGenre(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await bookService.getGenre({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                genre: result.genre
+            })
+        }
+    }
+
+    static async editGenre(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { name, parentId } = req.body
+        const normalizedParentId = typeof parentId === 'string' ? parentId.trim() : parentId
+        const sanitizedParentId = normalizedParentId || null
+
+        const fieldsConfig = {
+            required: ['name'],
+            labels: {
+                name: 'Nome',
+            }
+        }
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        if (sanitizedParentId) {
+            const objectIdValidation = validateObjectIds({
+                objects: ['parentId'],
+                labels: {
+                    parentId: 'ID do gênero pai'
+                }
+            })
+            req.body.parentId = sanitizedParentId
+            const objectIdsValidation = objectIdValidation(req, res)
+            if (!objectIdsValidation) return
+        }
+
+        const result = await bookService.editGenre({
+            id,
+            name,
+            parentId: sanitizedParentId
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                genre: result.genre
+            })
+        }
+    }
+
+    static async deleteGenre(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await bookService.deleteGenre({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                genre: result.genre
             })
         }
     }
