@@ -5,7 +5,7 @@ const BookCopy = mongoose.model(
     'BookCopy',
     new Schema(
         {
-        BookId: {
+        bookId: {
             type: Schema.Types.ObjectId,
             ref: 'Book',
             required: true
