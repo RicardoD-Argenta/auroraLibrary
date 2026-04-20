@@ -819,4 +819,294 @@ module.exports = class BookController {
         }
     }
 
+
+    // ------------------------ criação de exemplares ------------------------ //
+    static async registerBookCopy(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { bookId, sectorId, shelfId, copycode, status, condition, acquireAt, notes } = req.body
+
+        const fieldsConfig = {
+            required: ['bookId', 'sectorId', 'shelfId', 'copycode', 'status', 'condition', 'acquireAt'],
+            labels: {
+                bookId: 'ID do livro',
+                sectorId: 'ID do setor',
+                shelfId: 'ID da estante',
+                copycode: 'Código do exemplar',
+                status: 'Disponibilidade',
+                condition: 'Condição',
+                acquireAt: 'Data da aquisição',
+                notes: 'Observações'
+            }
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        // verifica se os IDs são válidos
+        const objectIdValidation = validateObjectIds({
+            objects: ['bookId', 'sectorId', 'shelfId'],
+            labels: {
+                bookId: 'ID do livro',
+                sectorId: 'ID do setor',
+                shelfId: 'ID da estante'
+            }
+        })
+        const okIds = objectIdValidation(req, res)
+        if (!okIds) return
+
+        const verifCopycode = parseInt(copycode)
+        // verifica se o código é válido
+        if (isNaN(verifCopycode) || verifCopycode <= 0) {
+            return res.status(400).json({ message: 'Código do exemplar inválido', err: 'invalid-copycode' })
+        }
+
+        // verifica se o status é válido
+        if (!['available', 'borrowed', 'reserved', 'lost', 'maintenance'].includes(status)) {
+            return res.status(400).json({
+                message: 'Status inválido',
+                err: 'invalid-status'
+            })
+        }
+
+        // verifica se a condição é válida
+        if (!['new', 'good', 'worn', 'damaged'].includes(condition)) {
+            return res.status(400).json({
+                message: 'Condição inválida',
+                err: 'invalid-condition'
+            })
+        }
+
+        const dates = isDate({
+            dates: ['acquireAt'],
+            labels: {
+                acquireAt: 'Data da aquisição'
+            }
+        })
+        const datesValidation = dates(req)
+        if (!datesValidation.valid) {
+            return res.status(datesValidation.status).json({
+                message: datesValidation.message,
+                err: datesValidation.err
+            })
+        }
+
+        const result = await bookService.registerBookCopy({
+            bookId,
+            sectorId,
+            shelfId,
+            copycode,
+            status,
+            condition,
+            acquireAt,
+            notes
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                bookCopy: result.bookCopy
+            })
+        }
+    }
+
+    static async getAllBookCopies(req, res) {
+        const result = await bookService.getAllBookCopies()
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                bookCopies: result.bookCopies
+            })
+        }
+    }
+
+    static async getBookCopy(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await bookService.getBookCopy({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                bookCopy: result.bookCopy
+            })
+        }
+    }
+
+    static async editBookCopy(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { bookId, sectorId, shelfId, copycode, status, condition, acquireAt, notes } = req.body
+
+        const fieldsConfig = {
+            required: ['bookId', 'sectorId', 'shelfId', 'copycode', 'status', 'condition', 'acquireAt'],
+            labels: {
+                bookId: 'ID do livro',
+                sectorId: 'ID do setor',
+                shelfId: 'ID da estante',
+                copycode: 'Código do exemplar',
+                status: 'Disponibilidade',
+                condition: 'Condição',
+                acquireAt: 'Data da aquisição',
+                notes: 'Observações'
+            }
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        // verifica se os IDs são válidos
+        const objectIdValidation = validateObjectIds({
+            objects: ['bookId', 'sectorId', 'shelfId'],
+            labels: {
+                bookId: 'ID do livro',
+                sectorId: 'ID do setor',
+                shelfId: 'ID da estante'
+            }
+        })
+        const okIds = objectIdValidation(req, res)
+        if (!okIds) return
+
+        const verifCopycode = parseInt(copycode)
+        // verifica se o código é válido
+        if (isNaN(verifCopycode) || verifCopycode <= 0) {
+            return res.status(400).json({ message: 'Código do exemplar inválido', err: 'invalid-copycode' })
+        }
+
+        // verifica se o status é válido
+        if (!['available', 'borrowed', 'reserved', 'lost', 'maintenance'].includes(status)) {
+            return res.status(400).json({
+                message: 'Status inválido',
+                err: 'invalid-status'
+            })
+        }
+
+        // verifica se a condição é válida
+        if (!['new', 'good', 'worn', 'damaged'].includes(condition)) {
+            return res.status(400).json({
+                message: 'Condição inválida',
+                err: 'invalid-condition'
+            })
+        }
+
+        const dates = isDate({
+            dates: ['acquireAt'],
+            labels: {
+                acquireAt: 'Data da aquisição'
+            }
+        })
+        const datesValidation = dates(req)
+        if (!datesValidation.valid) {
+            return res.status(datesValidation.status).json({
+                message: datesValidation.message,
+                err: datesValidation.err
+            })
+        }
+
+        const result = await bookService.editBookCopy({
+            id,
+            bookId,
+            sectorId,
+            shelfId,
+            copycode,
+            status,
+            condition,
+            acquireAt,
+            notes
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                bookCopy: result.bookCopy
+            })
+        }
+    }
+
+    static async deleteBookCopy(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await bookService.deleteBookCopy({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                bookCopy: result.bookCopy
+            })
+        }
+    }
+
 }

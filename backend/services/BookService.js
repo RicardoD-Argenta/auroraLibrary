@@ -3,6 +3,11 @@
     const Author = require('../models/Book/Author')
     const Genre = require('../models/Book/Genre')
     const Book = require('../models/Book/Book')
+    const BookCopy = require('../models/Book/BookCopy')
+
+// imports
+    const LibraryService = require('./LibraryService')
+    const libraryService = new LibraryService()
 
 // helpers
 
@@ -511,10 +516,9 @@ module.exports = class BookService {
     async registeredBook(bookData) {
         try {
             const book = await Book.findOne({
-                $or: [
-                    { title: bookData.title },
-                    { isbn: bookData.isbn },
-                ], _id: { $ne: bookData.id }
+                title: bookData.title,
+                isbn: bookData.isbn,
+                _id: { $ne: bookData.id }
             })
             if (book) {
                 return {
@@ -736,6 +740,224 @@ module.exports = class BookService {
             return {
                 valid: false,
                 message: 'Erro ao excluir o livro',
+                err: error.message
+            }
+        }
+    }
+
+
+    // ------------------------ criação de exemplares ------------------------ //
+    async registeredBookCopy(bookCopyData) {
+        try {
+            const bookCopy = await BookCopy.findOne({
+                bookId: bookCopyData.bookId,
+                copycode: bookCopyData.copycode,
+                _id: { $ne: bookCopyData.id }
+            })
+            if (bookCopy) {
+                return {
+                    valid: false,
+                    message: 'Exemplar já cadastrado',
+                    err: 'book-copy-already-registered'
+                }
+            }
+            else {
+                return {
+                    valid: true,
+                    bookCopy
+                }
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar exemplar',
+                err: error.message
+            }
+        }
+    }
+
+    async existingBookCopy(bookCopyData) {
+        try {
+            const bookCopy = await BookCopy.findById(bookCopyData.id)
+            if (!bookCopy) {
+                return {
+                    valid: false,
+                    message: 'Exemplar não cadastrado',
+                    err: 'book-copy-not-registered'
+                }
+            }
+            else {
+                return {
+                    valid: true,
+                    bookCopy
+                }
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar exemplar',
+                err: error.message
+            }
+        }
+    }
+
+    async registerBookCopy(bookCopyData) {
+        const registeredBookCopy = await this.registeredBookCopy(bookCopyData)
+        if (registeredBookCopy && !registeredBookCopy.valid) {
+            return registeredBookCopy
+        }
+
+        const book = await this.existingBook({
+            id: bookCopyData.bookId
+        })
+        if (book && !book.valid) {
+            return book
+        }
+
+        const sector = await libraryService.existingSector({
+            id: bookCopyData.sectorId
+        })
+        if (sector && !sector.valid) {
+            return sector
+        }
+
+        const shelf = await libraryService.existingShelf({
+            id: bookCopyData.shelfId
+        })
+        if (shelf && !shelf.valid) {
+            return shelf
+        }
+
+        const bookCopy = new BookCopy({
+            bookId: bookCopyData.bookId,
+            sectorId: bookCopyData.sectorId,
+            shelfId: bookCopyData.shelfId,
+            copycode: bookCopyData.copycode,
+            status: bookCopyData.status,
+            condition: bookCopyData.condition,
+            acquireAt: bookCopyData.acquireAt,
+            notes: bookCopyData.notes
+        })
+
+        try {
+            const newBookCopy = await bookCopy.save()
+            return {
+                valid: true,
+                message: 'Exemplar cadastrado com sucesso',
+                bookCopy: newBookCopy
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao cadastrar o exemplar',
+                err: error.message
+            }
+        }
+    }
+
+    async getAllBookCopies() {
+        try {
+            const bookCopies = await BookCopy.find()
+            return {
+                valid: true,
+                bookCopies
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar exemplares',
+                err: error.message
+             }
+        }
+    }
+
+    async getBookCopy(bookCopyData) {
+        const existingBookCopy = await this.existingBookCopy(bookCopyData)
+        if (existingBookCopy && !existingBookCopy.valid) {
+            return existingBookCopy
+        }
+        return {
+            valid: true,
+            bookCopy: existingBookCopy.bookCopy
+        }
+    }
+
+    async editBookCopy(bookCopyData) {
+        const existingBookCopy = await this.existingBookCopy(bookCopyData)
+        if (existingBookCopy && !existingBookCopy.valid) {
+            return existingBookCopy
+        }
+
+        const registeredBookCopy = await this.registeredBookCopy(bookCopyData)
+        if (registeredBookCopy && !registeredBookCopy.valid) {
+            return registeredBookCopy
+        }
+
+        const book = await this.existingBook({
+            id: bookCopyData.bookId
+        })
+        if (book && !book.valid) {
+            return book
+        }
+
+        const sector = await libraryService.existingSector({
+            id: bookCopyData.sectorId
+        })
+        if (sector && !sector.valid) {
+            return sector
+        }
+
+        const shelf = await libraryService.existingShelf({
+            id: bookCopyData.shelfId
+        })
+        if (shelf && !shelf.valid) {
+            return shelf
+        }
+
+        const bookCopy = existingBookCopy.bookCopy
+        bookCopy.set({
+            bookId: bookCopyData.bookId,
+            sectorId: bookCopyData.sectorId,
+            shelfId: bookCopyData.shelfId,
+            copycode: bookCopyData.copycode,
+            status: bookCopyData.status,
+            condition: bookCopyData.condition,
+            acquireAt: bookCopyData.acquireAt,
+            notes: bookCopyData.notes
+        })
+
+        try {
+            const updatedBookCopy = await bookCopy.save()
+            return {
+                valid: true,
+                message: 'Exemplar atualizado com sucesso',
+                bookCopy: updatedBookCopy
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar o exemplar',
+                err: error.message
+            }
+        }
+    }
+
+    async deleteBookCopy(bookCopyData) {
+        const existingBookCopy = await this.existingBookCopy(bookCopyData)
+        if (existingBookCopy && !existingBookCopy.valid) {
+            return existingBookCopy
+        }
+
+        try {
+            await BookCopy.findByIdAndDelete(existingBookCopy.bookCopy._id)
+            return {
+                valid: true,
+                message: 'Exemplar excluído com sucesso'
+             }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao excluir o exemplar',
                 err: error.message
             }
         }

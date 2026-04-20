@@ -34,4 +34,11 @@ router.get('/book/:id', verifyToken({ role: ['admin', 'librarian'] }), BookContr
 router.patch('/book/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.editBook)
 router.delete('/book/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.deleteBook)
 
+// bookCopy
+router.post('/bookCopy/register', verifyToken({ role: ['admin', 'librarian'] }), BookController.registerBookCopy)
+router.get('/bookCopy/all', verifyToken({ role: ['admin', 'librarian'] }), BookController.getAllBookCopies)
+router.get('/bookCopy/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.getBookCopy)
+router.patch('/bookCopy/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.editBookCopy)
+router.delete('/bookCopy/:id', verifyToken({ role: ['admin', 'librarian'] }), BookController.deleteBookCopy)
+
 module.exports = router
