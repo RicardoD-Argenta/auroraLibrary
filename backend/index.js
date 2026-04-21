@@ -23,10 +23,12 @@ const connectDB = require('./db/conn')
 const AuthRoutes = require('./routes/AuthRoutes')
 const LibraryRoutes = require('./routes/LibraryRoutes')
 const BookRoutes = require('./routes/BookRoutes')
+const LoanRoutes = require('./routes/LoanRoutes')
 
 app.use('/auth', AuthRoutes)
 app.use('/library', LibraryRoutes)
 app.use('/book', BookRoutes)
+app.use('/loan', LoanRoutes)
 
 // Inicialização
 const start = async () => {
