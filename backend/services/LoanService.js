@@ -35,6 +35,31 @@ module.exports = class LoanService {
         }
     }
 
+    async existingLoan(loanData) {
+        try {
+            const loan = await Loan.findOne({
+                _id: loanData.id
+            })
+            if (!loan) {
+                return {
+                    valid: false,
+                    message: 'Empréstimo não cadastrado',
+                    err: 'loan-not-registered'
+                }
+            }
+            return {
+                valid: true,
+                loan
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar empréstimo',
+                err: error.message
+            }
+        }
+    }
+
     async registerLoan(loanData) {
         // verifica se o exemplar existe
         const book = await bookService.existingBookCopy({
@@ -103,6 +128,34 @@ module.exports = class LoanService {
                 message: 'Erro ao cadastrar empréstimo',
                 err: error.message
             }
+        }
+    }
+
+    async allLoans() {
+        try {
+            const loans = await Loan.find({ status: 'active' })
+                .sort({ createdAt: -1 })
+            return {
+                valid: true,
+                loans
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar empréstimos',
+                err: error.message
+            }
+        }
+    }
+
+    async loanById(loanData) {
+        const existingLoan = await this.existingLoan(loanData)
+        if (!existingLoan.valid) {
+            return existingLoan
+        }
+        return {
+            valid: true,
+            loan: existingLoan.loan
         }
     }
 }

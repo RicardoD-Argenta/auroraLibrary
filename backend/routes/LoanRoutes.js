@@ -8,5 +8,7 @@ const verifyToken = require('../helpers/verify-token')
 
 // loan
 router.post('/register', verifyToken({ role: ['admin', 'librarian'] }), LoanController.registerLoan)
+router.get('/all', verifyToken({ role: ['admin', 'librarian'] }), LoanController.allLoans)
+router.get('/:id', verifyToken({ role: ['admin', 'librarian'] }), LoanController.loanById)
 
 module.exports = router

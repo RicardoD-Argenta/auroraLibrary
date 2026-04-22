@@ -110,7 +110,47 @@ module.exports = class LoanController {
                 loan: result.loan
             })
         }
+    }
 
+    static async allLoans(req, res) {
+        const loans = await loanService.allLoans()
+        if (!loans.valid) {
+            return res.status(400).json({
+                message: loans.message,
+                err: loans.err
+            })
+        } else {
+            return res.status(200).json({
+                message: loans.message,
+                loans: loans.loans
+            })
+        }
+    }
+
+    static async loanById(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await loanService.loanById({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                loan: result.loan
+            })
+        }
     }
 
 }
