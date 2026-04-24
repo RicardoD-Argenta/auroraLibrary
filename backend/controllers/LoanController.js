@@ -153,4 +153,150 @@ module.exports = class LoanController {
         }
     }
 
+    static async updateLoan(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { notes, dueDate, conditionIn, status } = req.body
+        let returnDate = req.body.returnDate
+
+        const fieldsConfig = {
+            required: ['dueDate', 'conditionIn', 'status'],
+            labels: {
+                dueDate: 'Data de vencimento',
+                conditionIn: 'Condição final do exemplar',
+                status: 'Status do empréstimo'
+            }
+        }
+
+
+        if (status === 'returned') {
+            fieldsConfig.required.push('returnDate')
+            fieldsConfig.labels.returnDate = 'Data de devolução'
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        // verifica as datas
+        const datesConfig = {
+            dates: ['dueDate'],
+            labels: {
+                dueDate: 'Data de vencimento'
+            }
+        }
+
+        if (status === 'overdue') {
+            const deadline = new Date(dueDate)
+            const today = new Date()
+            if (deadline.getTime() > today.getTime()) {
+                return res.status(400).json({
+                    message: 'Data de vencimento deve ser menor que a data atual para configurar um atraso',
+                    err: 'invalid-due-date'
+                })
+            }
+        }
+
+        if (status !== 'returned') {
+            returnDate = null
+        }
+
+        if (status === 'returned') {
+            datesConfig.dates.push('returnDate')
+            datesConfig.labels.returnDate = 'Data de devolução'
+        }
+        
+        const dates = isDate(datesConfig)
+        const datesValidation = dates(req)
+        if (!datesValidation.valid) {
+            return res.status(datesValidation.status).json({
+                message: datesValidation.message,
+                err: datesValidation.err
+            })
+        }
+
+        if (!['active', 'returned', 'overdue', 'lost'].includes(status)) {
+            return res.status(400).json({
+                message: 'Status inválido',
+                err: 'invalid-status'
+            })
+        }
+
+        if (!['new', 'good', 'worn', 'damaged'].includes(conditionIn)) {
+            return res.status(400).json({
+                message: 'Condição inválida',
+                err: 'invalid-condition'
+            })
+        }
+    
+        const result = await loanService.updateLoan({
+            id,
+            notes,
+            dueDate,
+            returnDate,
+            status,
+            conditionIn
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                loan: result.loan
+            })
+        }
+    }
+
+
+    static async deleteLoan(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await loanService.deleteLoan({
+            id
+        })
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                loan: result.loan
+            })
+        }
+    }
+
 }

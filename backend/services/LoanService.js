@@ -158,4 +158,120 @@ module.exports = class LoanService {
             loan: existingLoan.loan
         }
     }
+
+
+    async updateLoan(loanData) {
+        const existingLoan = await this.existingLoan(loanData)
+        if (existingLoan && !existingLoan.valid) {
+            return existingLoan
+        }
+
+        if (existingLoan.loan.status == 'returned') {
+            return {
+                valid: false,
+                message: 'Este empréstimo já foi devolvido',
+                err: 'loan-already-returned'
+            }
+        }
+
+        const loanDate = new Date(existingLoan.loan.loanDate)
+        const dueDate = new Date(loanData.dueDate)
+        const returnDate = new Date(loanData.returnDate)
+
+        if (loanDate.getTime() > dueDate.getTime()) {
+            return {
+                valid: false,
+                message: 'Data de vencimento deve ser maior que a data de empréstimo',
+                err: 'invalid-due-date'
+            }
+        }
+
+        if (loanDate.getTime() > returnDate.getTime()) {
+            return {
+                valid: false,
+                message: 'Data de devolução deve ser maior que a data de empréstimo',
+                err: 'invalid-return-date'
+            }
+        }
+
+        // verifica se já existe um exemplar ativo
+        const registeredLoan = await this.registeredLoan({
+            id: loanData.id,
+            copyId: existingLoan.loan.copyId,
+            status: loanData.status
+        })
+        if (registeredLoan && !registeredLoan.valid) {
+            return registeredLoan
+        }
+
+        const loan = existingLoan.loan
+        loan.set({
+            notes: loanData.notes,
+            dueDate: loanData.dueDate,
+            returnDate: loanData.returnDate,
+            conditionIn: loanData.conditionIn,
+            status: loanData.status
+        })
+
+        try {
+            const updatedLoan = await loan.save()
+
+            if (loanData.status === 'returned') {
+                await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'available' })
+            }
+            else if (loanData.status === 'overdue' || loanData.status === 'active') {
+                await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'borrowed' })
+            }
+            else if (loanData.status === 'lost') {
+                await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'lost' })
+            }
+
+            await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { condition: loanData.conditionIn })
+
+            return {
+                valid: true,
+                message: 'Empréstimo atualizado com sucesso',
+                loan: updatedLoan
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar empréstimo',
+                err: error.message
+            }
+        }
+    }
+
+    async deleteLoan(loanData) {
+        const existingLoan = await this.existingLoan(loanData)
+        if (existingLoan && !existingLoan.valid) {
+            return existingLoan
+        }
+
+        try {
+            const activeLoan = await Loan.findOne({
+                copyId: existingLoan.loan.copyId,
+                status: 'active',
+                _id: { $ne: existingLoan.loan._id }
+            })
+
+            await Loan.findByIdAndDelete(existingLoan.loan._id)
+
+            if (!activeLoan) {
+                await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'available' })
+            }
+
+            return {
+                valid: true,
+                message: 'Empréstimo excluído com sucesso'
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao excluir empréstimo',
+                err: error.message
+            }
+        }
+    }
+
 }
