@@ -85,14 +85,6 @@ module.exports = class UserService {
             role: userData.role
         })
 
-        if (userData.confirmPassword !== userData.password) {
-            return {
-                valid: false,
-                message: 'Senhas não conferem',
-                err: 'password-not-match'
-            }
-        }
-        
         try {
             const newUser = await user.save()
             const token = createUserToken(newUser)
@@ -212,10 +204,13 @@ module.exports = class UserService {
 
         try {
             const updatedUser = await user.save()
+            const token = await createUserToken(updatedUser)
             return {
                 valid: true,
                 message: 'Usuário atualizado com sucesso',
-                user: updatedUser
+                token: token,
+                userId: updatedUser._id,
+                userRole: updatedUser.role
             }
         } catch (error) {
             return {
@@ -231,6 +226,14 @@ module.exports = class UserService {
         const existingUser = await this.existingUser(userData)
         if (existingUser && !existingUser.valid) {
             return existingUser
+        }
+
+        if (existingUser.user.role === 'admin') {
+            return {
+                valid: false,
+                message: 'Acesso negado',
+                err: 'access-denied'
+            }
         }
 
         try {

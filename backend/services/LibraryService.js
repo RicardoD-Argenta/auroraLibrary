@@ -138,6 +138,11 @@ module.exports = class LibraryService {
             return existingMember
         }
 
+        const registeredMember = await this.registeredMember(memberData)
+        if (registeredMember && !registeredMember.valid) {
+            return registeredMember
+        }
+
         const member = existingMember.member
         member.set({
             name: memberData.name,
@@ -147,11 +152,6 @@ module.exports = class LibraryService {
             member: memberData.member,
             observations: memberData.observations
         })
-
-        const registeredMember = await this.registeredMember(memberData)
-        if (registeredMember && !registeredMember.valid) {
-            return registeredMember
-        }
 
         try {
             const updatedMember = await member.save()
