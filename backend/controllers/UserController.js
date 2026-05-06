@@ -61,6 +61,13 @@ module.exports = class UserController {
             })
         }
 
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                message: 'Senhas não conferem',
+                err: 'password-not-valid'
+            })
+        }
+
         const result = await userService.register({
             name,
             login,
@@ -259,7 +266,9 @@ module.exports = class UserController {
         } else {
             return res.status(200).json({
                 message: result.message,
-                user: result.user
+                token: result.token,
+                userId: result.userId,
+                userRole: result.userRole
             })
         }
     }
