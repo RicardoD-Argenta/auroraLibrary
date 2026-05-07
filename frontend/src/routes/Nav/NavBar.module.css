@@ -1,0 +1,30 @@
+.navbar {
+    padding: 1rem 1rem;
+}
+
+.navlist {
+    display: flex;
+    justify-content: end;
+}
+
+
+.navlist li {
+    padding: 0 12px;
+    border-left: 2px solid var(--border-color);
+    list-style: none;
+    cursor: pointer;
+}
+
+.navlist li:first-child {
+    border-left: none;
+}
+
+.navlist li a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: .1s;
+}
+
+.navlist li a:hover {
+    color: var(--selected-color);
+}

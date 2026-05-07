@@ -9,7 +9,7 @@ const app = express()
 app.use(express.json())
 
 // Configuração do CORS
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }))
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' }))
 
 // Pasta pra imagens
 app.use('/images', express.static(path.join(__dirname, 'public/images')))

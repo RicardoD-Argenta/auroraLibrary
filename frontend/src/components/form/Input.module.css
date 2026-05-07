@@ -1,0 +1,38 @@
+.form-control {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.form-control label {
+    margin-bottom: .3rem;
+    font-size: .9rem;
+}
+
+.form-control input {
+    padding: 2px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.form-control input:focus {
+    outline: none;
+    border-color: var(--selected-color);
+}
+
+.form-control input[type=submit] {
+    background-color: var(--selected-color);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    padding: 3px 20px;
+}
+
+.form-control input[type=submit]:active {
+    background-color: var(--selected-color-hover);
+}
+
+.form-control input[type=submit][disabled] {
+    background-color: var(--selected-color-disabled);
+}
