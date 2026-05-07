@@ -10,9 +10,6 @@ import Login from './routes/Auth/Login.jsx'
 import Register from './routes/Auth/Register.jsx'
 
 
-// Context
-import { UserProvider } from './context/UserContext.jsx'
-
 import { createBrowserRouter, RouterProvider, Route, Navigate } from 'react-router-dom'
 
 
@@ -39,7 +36,5 @@ const router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-  <UserProvider>
-    <RouterProvider router={router} />
-  </UserProvider>
+  <RouterProvider router={router} />
 )
