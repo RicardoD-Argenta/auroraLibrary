@@ -18,16 +18,13 @@ export default function useToast() {
         toast.error(message, toastConfig)
     }
 
-    function promise(fn) {
-        return toast.promise(fn, {
-            pending: 'Carregando...',
-            success: null,
-            error: {
-                render({ data }) {
-                    return data.response?.data?.message ?? 'Erro inesperado'
-                }
-            }
-        }, toastConfig)
+    async function promise(fn) {
+        try {
+            return await fn
+        } catch (err) {
+            error(err.response?.data?.message ?? 'Erro inesperado')
+            throw err
+        }
     }
 
     return { success, error, promise }
