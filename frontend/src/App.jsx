@@ -1,7 +1,7 @@
 import './App.css'
 
 import NavBar from './routes/Nav/NavBar.jsx'
-import Container from './routes/Container.jsx'
+import SideBar from './routes/Nav/SideBar.jsx'
 
 import { Outlet } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -17,9 +17,14 @@ function App() {
     <UserProvider>
       <div className="app">
         <NavBar />
-        <Container>
-          <Outlet />
-        </Container>
+        <div className="app-container">
+          <div className="side-bar">
+            <SideBar />
+          </div>
+          <div className="content">
+            <Outlet />
+          </div>
+        </div>
         <ToastContainer limit={3} newestOnTop />
       </div>
     </UserProvider>

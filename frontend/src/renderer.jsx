@@ -9,27 +9,42 @@ import Home from './routes/Home.jsx'
 import Login from './routes/Auth/Login.jsx'
 import Register from './routes/Auth/Register.jsx'
 
+import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
+import { useContext } from 'react'
+import { UserContext } from './context/UserContext.jsx'
 
-import { createBrowserRouter, RouterProvider, Route, Navigate } from 'react-router-dom'
+const PrivateRoute = ({ roles }) => {
+  const { auth } = useContext(UserContext)
+  const { authenticated, user, authLoading } = auth
 
+  if (authLoading) return null
+  if (!authenticated) return <Navigate to="/login" />
+  if (roles && user && !roles.includes(user.role)) return <Navigate to="/" />
+  return <Outlet />
+}
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-    errorElement: <ErrorPage/>, // pagina de erro para quando a rota não for encontrada ou ocorrer algum erro no carregamento da página
+    errorElement: <ErrorPage/>,
     children: [
       {
-        path: '/',
-        element: <Home />
+        element: <PrivateRoute />,
+        children: [
+          {
+            path: '/',
+            element: <Home />
+          },
+          {
+            path: '/register',
+            element: <Register />
+          },
+        ]
       },
       {
         path: '/login',
         element: <Login />
-      },
-      {
-        path: '/register',
-        element: <Register />
       },
     ]
   },

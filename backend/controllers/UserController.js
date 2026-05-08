@@ -305,4 +305,23 @@ module.exports = class UserController {
         }
     }
 
+    static async getCurrentUser(req, res) {
+        const userId = req.authenticatedUserId
+
+        const result = await userService.getUser({
+            id: userId,
+        })
+        if(!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                user: result.user
+            })
+        }
+    }
+
 }

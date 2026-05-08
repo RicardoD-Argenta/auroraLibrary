@@ -252,4 +252,20 @@ module.exports = class UserService {
 
     }
 
+    async getCurrentUser(userData) {
+        try {
+            const user = await User.findById({ _id: userData.id }, '-password')
+            return {
+                valid: true,
+                user
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar usuário',
+                err: error.message
+             }
+         }
+    }
+
 }

@@ -11,22 +11,12 @@ const NavBar = () => {
   const { auth } = useContext(UserContext)
   const { authenticated, logout } = auth
 
+  if (!authenticated) return null
+
   return (
     <nav className={styles.navbar}>
         <ul className={styles.navlist}>
-            { authenticated ? (
-              <>
-                <li><Link to="/register">Register</Link></li>
-                <li><Link to="/">Home</Link></li>
-                <li onClick={logout}><a href="#">Logout</a></li>
-              </>
-            ):
-            (
-              <>
-                <li><Link to="/login">Login</Link></li>
-              </>
-            )}
-            
+            <li onClick={logout}><a href="#">Logout</a></li>
         </ul>
     </nav>
   )
