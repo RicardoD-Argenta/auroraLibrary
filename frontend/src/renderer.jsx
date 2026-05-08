@@ -7,7 +7,6 @@ import Home from './routes/Home.jsx'
 
 // Auth
 import Login from './routes/Auth/Login.jsx'
-import Register from './routes/Auth/Register.jsx'
 
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import { useContext } from 'react'
@@ -35,10 +34,6 @@ const router = createBrowserRouter([
           {
             path: '/',
             element: <Home />
-          },
-          {
-            path: '/register',
-            element: <Register />
           },
         ]
       },
