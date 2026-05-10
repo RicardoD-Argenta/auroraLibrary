@@ -3,30 +3,41 @@ import './App.css'
 import NavBar from './routes/Nav/NavBar.jsx'
 import SideBar from './routes/Nav/SideBar.jsx'
 
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 // Context
 import { UserProvider } from './context/UserContext.jsx'
+import { SideBarProvider, useSideBar } from './context/SideBarContext.jsx'
 
-function App() {
+const PUBLIC_ROUTES = ['/login']
 
+function AppLayout() {
+  const { collapsed } = useSideBar()
+  const { pathname } = useLocation()
+  const isPublic = PUBLIC_ROUTES.includes(pathname)
 
   return (
-    <UserProvider>
-      <div className="app">
-        <NavBar />
-        <div className="app-container">
-          <div className="side-bar">
-            <SideBar />
-          </div>
-          <div className="content">
-            <Outlet />
-          </div>
+    <div className="app">
+      <NavBar />
+      <div className="app-container">
+        {!isPublic && <SideBar />}
+        <div className={`content ${collapsed || isPublic ? 'content-expanded' : ''} ${!isPublic ? 'content-private' : ''}`}>
+          <Outlet />
         </div>
-        <ToastContainer limit={3} newestOnTop />
       </div>
+      <ToastContainer limit={3} newestOnTop />
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <UserProvider>
+      <SideBarProvider>
+        <AppLayout />
+      </SideBarProvider>
     </UserProvider>
   )
 }
