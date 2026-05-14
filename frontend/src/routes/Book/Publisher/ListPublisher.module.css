@@ -1,0 +1,22 @@
+.searchContainer {
+    width: 90%;
+    margin: 2rem auto 0;
+}
+
+.listContainer {
+    width: 90%;
+    margin: 1rem auto;
+}
+
+@media (min-width: 1440px) {
+    .searchContainer {
+        width: 70%;
+        margin: 2rem auto 0;
+    }
+
+    .listContainer {
+        width: 70%;
+        margin: 1rem auto;
+    }
+
+}

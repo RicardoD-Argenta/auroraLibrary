@@ -1,0 +1,28 @@
+.header {
+    display: flex;
+    flex-direction: column;
+    width: 10.5rem;
+}
+
+.header button {
+    margin-top: .5rem;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-weight: bold;
+    padding: 2px 0;
+}
+
+.header button:active {
+    background-color: var(--background-color-variant);
+}
+
+.header button:last-child {
+    background-color: var(--warning-red);
+    color: var(--background-color);
+    border: 1px solid var(--warning-red);
+}
+
+.header button:last-child:active {
+    background-color: var(--warning-red-selected);
+}

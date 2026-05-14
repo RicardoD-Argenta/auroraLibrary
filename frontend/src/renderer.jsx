@@ -5,6 +5,13 @@ import App from './App.jsx'
 import ErrorPage from './routes/ErrorPage.jsx'
 import Home from './routes/Home.jsx'
 
+// Book
+
+  // Publisher
+import CreatePublisher from './routes/Book/Publisher/CreatePublisher.jsx'
+import ListPublisher from './routes/Book/Publisher/ListPublisher.jsx'
+import EditPublisher from './routes/Book/Publisher/EditPublisher.jsx'
+
 // Auth
 import Login from './routes/Auth/Login.jsx'
 
@@ -35,6 +42,18 @@ const router = createBrowserRouter([
             path: '/',
             element: <Home />
           },
+          {
+            path: '/book/publisher/register',
+            element: <CreatePublisher />
+          },
+          {
+            path: '/book/publisher/list',
+            element: <ListPublisher />
+          },
+          {
+            path: '/book/publisher/edit',
+            element: <EditPublisher />
+          }
         ]
       },
       {

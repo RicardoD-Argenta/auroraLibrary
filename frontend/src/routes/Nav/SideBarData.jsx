@@ -46,8 +46,8 @@ export const sidebarData = [
           },
           { label: 'Editoras',
               children: [
-                { label: 'Novo', path: '/books/publishers/new' },
-                { label: 'Listar', path: '/books/publishers' },
+                { label: 'Novo', path: '/book/publisher/register' },
+                { label: 'Listar', path: '/book/publisher/list' },
               ]
           },
         ]

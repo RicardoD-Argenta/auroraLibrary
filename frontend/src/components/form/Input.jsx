@@ -1,6 +1,6 @@
 import Styles from './Input.module.css'
 
-const Input = ({ type, text, name, placeholder, value, handleOnChange, multiple, disabled }) => {
+const Input = ({ type, text, name, placeholder, value, handleOnChange, multiple, disabled, limit }) => {
   return (
     <div className={Styles['form-control']}>
         <label htmlFor={name}>{text}</label>
@@ -12,6 +12,7 @@ const Input = ({ type, text, name, placeholder, value, handleOnChange, multiple,
             onChange={handleOnChange}
             {...(multiple ? { multiple } : '')}
             {...(disabled ? { disabled }  : '')}
+            {...(limit ? { maxLength: limit } : '')}
         />
     </div>
   )

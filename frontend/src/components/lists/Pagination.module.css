@@ -1,0 +1,23 @@
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+}
+
+.paginationContainer button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.3rem;
+}
+
+.paginationContainer button:active svg{
+    fill: var(--selected-color);
+}
+
+.paginationContainer button:disabled svg {
+    fill: var(--text-color-disabled);
+}
+
+.paginationContainer span {
+    margin: 0 .5rem;
+}

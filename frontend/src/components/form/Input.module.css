@@ -7,12 +7,14 @@
 .form-control label {
     margin-bottom: .3rem;
     font-size: .9rem;
+    font-weight: bold;
 }
 
 .form-control input {
     padding: 2px 8px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    background-color: var(--background-color);
 }
 
 .form-control input:focus {
@@ -30,6 +32,10 @@
 }
 
 .form-control input[type=submit]:active {
+    background-color: var(--selected-color-hover);
+}
+
+.form-control input[type=submit]:focus {
     background-color: var(--selected-color-hover);
 }
 
