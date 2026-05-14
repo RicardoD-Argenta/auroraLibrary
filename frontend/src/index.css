@@ -1,10 +1,14 @@
 :root {
   --text-color: #303030;
+  --text-color-disabled: #929292;
   --border-color: #696969;
   --selected-color: #7b53d8;
   --selected-color-hover: #4c2b9c;
   --selected-color-disabled: #ae8dfe;
   --background-color: #faf7f0;
+  --background-color-variant: #dbd5c8;
+  --warning-red: #c0392b;
+  --warning-red-selected: #a93226;
 }
 
 * {

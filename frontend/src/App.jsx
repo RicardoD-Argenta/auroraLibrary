@@ -24,7 +24,9 @@ function AppLayout() {
       <div className="app-container">
         {!isPublic && <SideBar />}
         <div className={`content ${collapsed || isPublic ? 'content-expanded' : ''} ${!isPublic ? 'content-private' : ''}`}>
-          <Outlet />
+          <div className="inside-content">
+            <Outlet />
+          </div>
         </div>
       </div>
       <ToastContainer limit={3} newestOnTop />

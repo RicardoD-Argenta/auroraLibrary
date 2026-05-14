@@ -1,0 +1,30 @@
+.actionsContainer {
+    display: flex;
+    gap: 0.6rem;
+}
+
+.actionsContainer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-color);
+    padding: 0.1rem 0.5rem;
+    cursor: pointer;
+    gap: 0.5rem;
+    border: 1px solid var(--text-color-disabled);
+    border-radius: 4px;
+}
+
+.actionsContainer button:active {
+    background-color: var(--background-color-variant);
+}
+
+@media screen and (max-width: 800px) {
+    .actionsContainer {
+        flex-direction: column;
+    }
+
+    .actionsContainer span {
+        display: none;
+    }
+}

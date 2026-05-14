@@ -1,6 +1,11 @@
 .form-container {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin: 2rem 0;
+}
+
+.form-container form {
+    width: 100%;
     max-width: 300px;
-    margin: 0 auto;
-    background-color: var(--background-color);
-    border-radius: 15px;
 }

@@ -99,19 +99,30 @@ module.exports = class BookService {
         }
     }
 
-    async getAllPublishers() {
+    async getAllPublishers({ page = 1, search = '' } = {}) {
         try {
-            const publishers = await Publisher.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? { name: { $regex: search, $options: 'i' } }
+                : {}
+
+            const publishers = await Publisher.find(query).skip(skip).limit(limit)
+            const total = await Publisher.countDocuments(query)
+
             return {
                 valid: true,
-                publishers
+                publishers,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
                 valid: false,
                 message: 'Erro ao buscar editoras',
                 err: error.message
-             }
+            }
         }
     }
 

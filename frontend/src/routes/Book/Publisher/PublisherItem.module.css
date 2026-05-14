@@ -1,0 +1,15 @@
+.itemContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nameContainer {
+    max-width: 80%;
+}
+
+.name {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
