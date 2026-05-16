@@ -1,0 +1,9 @@
+.header {
+    display: flex;
+    flex-direction: column;
+    width: 10.5rem;
+}
+
+.header > * {
+    margin-top: .5rem;
+}

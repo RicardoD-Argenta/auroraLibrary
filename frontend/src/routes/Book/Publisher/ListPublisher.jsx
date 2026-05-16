@@ -37,7 +37,7 @@ const ListPublisher = () => {
         </div>
         <section>
           <div className={styles.searchContainer}>
-            <Input text="Pesquisar" type="text" id="search" name="search" placeholder="Digite o nome da editora..." value={search} handleOnChange={(e) => { setSearch(e.target.value); setPage(1) }} />
+            <Input text="Pesquisar" type="text" id="search" name="search" placeholder="Digite o nome ou id da editora..." value={search} handleOnChange={(e) => { setSearch(e.target.value); setPage(1) }} />
           </div>
           <div className={styles.listContainer}>
               <List

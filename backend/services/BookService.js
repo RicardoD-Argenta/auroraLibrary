@@ -10,6 +10,7 @@
     const libraryService = new LibraryService()
 
 // helpers
+    const Counter = require('../models/Counter')
 
 
 module.exports = class BookService {
@@ -80,7 +81,10 @@ module.exports = class BookService {
             return registeredPublisher
         }
 
+        const code = await Counter.nextSequence('publisher')
+
         const publisher = new Publisher({
+            code,
             name: publisherData.name
         })
         try {
@@ -105,7 +109,10 @@ module.exports = class BookService {
             const skip = (page - 1) * limit
 
             const query = search
-                ? { name: { $regex: search, $options: 'i' } }
+                ? { $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { code: { $regex: search, $options: 'i' } }
+                ] }
                 : {}
 
             const publishers = await Publisher.find(query).skip(skip).limit(limit)

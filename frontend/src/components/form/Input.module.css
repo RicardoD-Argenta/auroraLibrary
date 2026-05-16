@@ -10,6 +10,7 @@
     font-weight: bold;
 }
 
+/* Input padrão */
 .form-control input {
     padding: 2px 8px;
     border: 1px solid var(--border-color);
@@ -22,6 +23,7 @@
     border-color: var(--selected-color);
 }
 
+/*  Input de Submit */
 .form-control input[type=submit] {
     background-color: var(--selected-color);
     color: #fff;
@@ -41,4 +43,11 @@
 
 .form-control input[type=submit][disabled] {
     background-color: var(--selected-color-disabled);
+}
+
+/* Input de desabilitado */
+.form-control.disabled :disabled {
+    background-color: var(--grey);
+    border-color: var(--text-color-disabled);
+    color: var(--text-color-variant);
 }

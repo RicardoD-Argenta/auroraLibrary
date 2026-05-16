@@ -1,28 +1,32 @@
-.header {
-    display: flex;
-    flex-direction: column;
-    width: 10.5rem;
-}
-
-.header button {
-    margin-top: .5rem;
+.button {
     background-color: var(--background-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-weight: bold;
-    padding: 2px 0;
+    padding: 2px 8px;
+    cursor: pointer;
 }
 
-.header button:active {
+.button:active {
     background-color: var(--background-color-variant);
 }
 
-.header button:last-child {
+.button.danger {
     background-color: var(--warning-red);
     color: var(--background-color);
-    border: 1px solid var(--warning-red);
+    border-color: var(--warning-red);
 }
 
-.header button:last-child:active {
+.button.danger:active {
     background-color: var(--warning-red-selected);
+}
+
+.button.submit {
+    background-color: var(--selected-color);
+    color: #fff;
+    border: none;
+}
+
+.button.submit:active {
+    background-color: var(--selected-color-hover);
 }

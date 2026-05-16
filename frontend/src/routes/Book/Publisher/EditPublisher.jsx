@@ -6,9 +6,10 @@ import ConfirmModal from '../../../components/lists/ConfirmModal'
 
 // Components
 import Input from '../../../components/form/Input'
+import Button from '../../../components/form/Button'
+import PageHeader from '../../../components/layout/PageHeader'
 
 import styles from '../../../components/form/Form.module.css'
-import additionalStyles from './EditPublisher.module.css'
 
 const EditPublisher = () => {
 
@@ -57,21 +58,24 @@ const EditPublisher = () => {
 
   return (
     <>
-        <div className={additionalStyles.header}>
-            <h2>Editar editora</h2>
-           <button onClick={() => navigate('/book/publisher/register')}>Criar nova editora</button>
-           <button onClick={() => setShowConfirm(true)}>Deletar Registro</button>
-        </div>
+        <PageHeader title="Editar editora">
+            <Button onClick={() => navigate('/book/publisher/register')}>Criar nova editora</Button>
+            <Button variant="danger" onClick={() => setShowConfirm(true)}>Deletar Registro</Button>
+            <Button variant="submit" type="submit" form="edit-publisher-form">Salvar</Button>
+        </PageHeader>
         {showConfirm && (
             <ConfirmModal onConfirm={handleDelete} onCancel={() => setShowConfirm(false)} />
         )}
         <section className={styles['form-container']}>
-            <form onSubmit={handleSubmit}>
+            <form id="edit-publisher-form" onSubmit={handleSubmit}>
                 <div className={styles['form-control']}>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Nome" type="text" id="name" name="name" placeholder="" limit={255} value={publisher.name} handleOnChange={handleChange} />
+                        <Input text="ID" type="text" name="id" placeholder="" limit={20} value={publisher.code} disabled />
                     </div>
-                    <Input type="submit" value="Salvar" />
+                    <div className={styles['input-wrapper']}>
+                        <Input text="Nome" type="text" name="name" placeholder="" limit={255} value={publisher.name} handleOnChange={handleChange} />
+                    </div>
+                    
                 </div>
             </form>
         </section>
