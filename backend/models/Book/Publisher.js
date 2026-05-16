@@ -9,7 +9,14 @@ const Publisher = mongoose.model(
             type: String,
             maxlength: 255,
             required: true
+        },
+        code: {
+            type: String,
+            required: true,
+            unique: true,
+            maxlength: 20
         }
+        
     },
     { timestamps: true }
     )

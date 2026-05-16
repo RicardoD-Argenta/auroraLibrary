@@ -1,15 +1,44 @@
+.itemContainer,
+.contentContainer,
+.labelContainer {
+    width: 100%;
+}
+
 .itemContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.nameContainer {
+.contentContainer {
     max-width: 80%;
+    gap: .3rem;
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.labelContainer {
+    display: flex;
+    gap: .3rem;
+}
+
+.code {
+    font-size: .8rem;
+    font-weight: bold;
+}
+
+
+.label {
+    font-size: .8rem;
+    font-weight: bold;
+    width: 3.3rem;
 }
 
 .name {
-    overflow-wrap: break-word;
-    word-break: break-word;
+    font-size: .9rem;
+    width: 100%;
+    margin-top: -2px;
 }
 

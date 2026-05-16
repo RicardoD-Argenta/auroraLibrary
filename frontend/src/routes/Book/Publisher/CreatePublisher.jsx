@@ -5,6 +5,8 @@ import usePublisher from '../../../hooks/usePublisher'
 
 // Components
 import Input from '../../../components/form/Input'
+import PageHeader from '../../../components/layout/PageHeader'
+import Button from '../../../components/form/Button'
 
 import styles from '../../../components/form/Form.module.css'
 
@@ -29,16 +31,15 @@ const CreatePublisher = () => {
 
   return (
     <div>
-        <div className="publisher-header">
-            <h2>Nova editora</h2>
-        </div>
+        <PageHeader title="Nova editora">
+            <Button variant="submit" type="submit" form="create-publisher-form">Salvar</Button>
+        </PageHeader>
         <section className={styles['form-container']}>
-            <form onSubmit={handleSubmit}>
+            <form id="create-publisher-form" onSubmit={handleSubmit}>
                 <div className={styles['form-control']}>
                     <div className={styles['input-wrapper']}>
                         <Input text="Nome" type="text" id="name" name="name" placeholder="" limit={255} value={publisher.name} handleOnChange={handleChange} />
                     </div>
-                    <Input type="submit" value="Criar" />
                 </div>
             </form>
         </section>

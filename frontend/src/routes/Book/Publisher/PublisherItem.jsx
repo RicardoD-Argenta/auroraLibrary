@@ -24,8 +24,12 @@ const PublisherItem = ({ item, onDeleteSuccess }) => {
     return (
         <li>
             <div className={styles.itemContainer}>
-                <div className={styles.nameContainer}>
-                    <span className={styles.name}>{item.name}</span>
+                <div className={styles.contentContainer}>
+                    <span className={styles.code}>ID: {item.code}</span>
+                    <div className={styles.labelContainer}>
+                        <span className={styles.label}>Nome:</span>
+                        <span className={styles.name}>{item.name}</span>
+                    </div>
                 </div>
                 <ListActions onDelete={() => handleDelete(item._id) } onEdit={() => handleEdit(item._id)} />
             </div>

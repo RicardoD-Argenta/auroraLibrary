@@ -8,6 +8,10 @@ const app = express()
 // Configuração do JSON
 app.use(express.json())
 
+// Sanitização global de strings no body
+const trimBody = require('./helpers/trimBody')
+app.use(trimBody)
+
 // Configuração do CORS
 app.use(cors({ credentials: true, origin: 'http://localhost:5173' }))
 
