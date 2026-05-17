@@ -235,7 +235,10 @@ module.exports = class BookController {
     }
 
     static async getAllAuthors(req, res) {
-        const result = await bookService.getAllAuthors()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+
+        const result = await bookService.getAllAuthors({ page, search })
         if (!result.valid) {
             return res.status(400).json({
                 message: result.message,
@@ -243,8 +246,9 @@ module.exports = class BookController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                authors: result.authors
+                authors: result.authors,
+                total: result.total,
+                pages: result.pages
             })
         }
     }
