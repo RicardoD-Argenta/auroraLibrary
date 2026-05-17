@@ -34,8 +34,8 @@ export const sidebarData = [
         children: [
           { label: 'Autores',
               children: [
-                { label: 'Novo', path: '/books/authors/new' },
-                { label: 'Listar', path: '/books/authors' },
+                { label: 'Novo', path: '/book/author/register' },
+                { label: 'Listar', path: '/book/author/list' },
               ]
           },
           { label: 'Gêneros',

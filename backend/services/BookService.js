@@ -15,6 +15,7 @@
 
 module.exports = class BookService {
 
+    // gambiarra q nem lembro pra q serve, entretanto NÃO REMOVER
     normalizeOptionalObjectId(value) {
         if (typeof value !== 'string') {
             return value || null
@@ -253,7 +254,10 @@ module.exports = class BookService {
             return registeredAuthor
         }
 
+        const code = await Counter.nextSequence('author')
+
         const author = new Author({
+            code,
             name: authorData.name
         })
         try {
@@ -272,12 +276,27 @@ module.exports = class BookService {
         }
     }
 
-    async getAllAuthors() {
+    async getAllAuthors({ page = 1, search = '' } = {}) {
         try {
-            const authors = await Author.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? { $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { code: { $regex: search, $options: 'i' } }
+                ] }
+                : {}
+
+            const authors = await Author.find(query).skip(skip).limit(limit)
+            const total = await Author.countDocuments(query)
+
+
             return {
                 valid: true,
-                authors
+                authors,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
