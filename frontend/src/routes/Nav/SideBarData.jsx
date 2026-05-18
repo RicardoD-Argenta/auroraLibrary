@@ -76,15 +76,15 @@ export const sidebarData = [
           { label: 'Listar', path: '/library/shelf/list' },
         ]
       },
-      { label: 'Usuários',
+      { label: 'Usuários', roles: ['admin'],
         children: [
           { label: 'Novo', path: '/users/new' },
           { label: 'Listar', path: '/users' },
         ]
       },
-      { label: 'Biblioteca',
+      { label: 'Biblioteca', roles: ['admin'],
         children: [
-          { label: 'Editar', path: '/libraries/edit' },
+          { label: 'Editar', path: '/libraries/edit', },
         ]
       }
     ]

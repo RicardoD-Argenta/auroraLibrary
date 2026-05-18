@@ -764,7 +764,8 @@ module.exports = class LibraryController {
         } else {
             return res.status(200).json({
                 message: result.message,
-                library: result.library
+                library: result.library,
+                libraryParams: result.libraryParams
             })
         }
     }
@@ -783,6 +784,9 @@ module.exports = class LibraryController {
         const isSchoolData = paramsData.isSchool ?? {}
         const loanDelayData = paramsData.loanDelay ?? {}
 
+        isSchoolData.active = isSchoolData.active === true || isSchoolData.active === 'true'
+        loanDelayData.active = loanDelayData.active === true || loanDelayData.active === 'true'
+
         const fieldsConfig = {
             required: ['name', 'params.isSchool.active', 'params.loanDelay.active'],
             labels: {
@@ -792,7 +796,7 @@ module.exports = class LibraryController {
             }
         }
 
-        if (loanDelayData.active === 'true') {
+        if (loanDelayData.active) {
             fieldsConfig.required.push('params.loanDelay.dailyRate', 'params.loanDelay.fineValue')
             fieldsConfig.labels['params.loanDelay.fineValue'] = 'Valor fixo da multa'
             fieldsConfig.labels['params.loanDelay.dailyRate'] = 'Valor diário da multa'
@@ -801,7 +805,7 @@ module.exports = class LibraryController {
             loanDelayData.fineValue = null
         }
 
-        if (loanDelayData.active === 'true') {
+        if (loanDelayData.active) {
             if (!validator.isFloat(loanDelayData.dailyRate)) {
                 return res.status(400).json({
                     message: 'Valor diário da multa inválido',

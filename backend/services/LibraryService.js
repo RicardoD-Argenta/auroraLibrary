@@ -548,9 +548,11 @@ module.exports = class LibraryService {
     async getLibrary() {
         try {
             const library = await Library.findOne()
+            const libraryParams = await LibraryParams.findOne()
             return {
                 valid: true,
-                library
+                library,
+                libraryParams
             }
         } catch (error) {
             return {
