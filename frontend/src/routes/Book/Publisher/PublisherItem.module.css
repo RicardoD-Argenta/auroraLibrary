@@ -11,12 +11,16 @@
 }
 
 .contentContainer {
-    max-width: 80%;
+    max-width: 100%;
     gap: .3rem;
     display: flex;
     flex-direction: column;
     overflow-wrap: break-word;
     word-break: break-word;
+}
+
+.actionsContainer {
+    padding: 0 0 0 1rem;
 }
 
 .labelContainer {
@@ -33,12 +37,19 @@
 .label {
     font-size: .8rem;
     font-weight: bold;
-    width: 3.3rem;
+    min-width: 3.3rem;
 }
 
 .name {
     font-size: .9rem;
     width: 100%;
+    min-width: 100px;
     margin-top: -2px;
 }
 
+@media screen and (max-width: 690px) {
+    .itemContainer {
+        padding: 0 1.5rem 0 0;
+    }
+    
+}

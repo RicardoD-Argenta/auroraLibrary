@@ -40,8 +40,8 @@ export const sidebarData = [
           },
           { label: 'Gêneros',
               children: [
-                { label: 'Novo', path: '/books/genres/new' },
-                { label: 'Listar', path: '/books/genres' },
+                { label: 'Novo', path: '/book/genre/register' },
+                { label: 'Listar', path: '/book/genre/list' },
               ]
           },
           { label: 'Editoras',

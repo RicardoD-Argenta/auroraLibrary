@@ -398,7 +398,7 @@ module.exports = class BookService {
 
     async existingGenre(genreData) {
         try {
-            const genre = await Genre.findById(genreData.id)
+            const genre = await Genre.findById(genreData.id).populate('parentId', 'name code')
             if (!genre) {
                 return {
                     valid: false,
@@ -409,6 +409,32 @@ module.exports = class BookService {
             return {
                 valid: true,
                 genre
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar gênero',
+                err: error.message
+            }
+        }
+    }
+
+    async hasSon(genreData) {
+        try {
+            const genre = await Genre.find(
+                { parentId: genreData.id },
+            )
+            if (genre.length > 0) {
+                return {
+                    valid: true,
+                    hasSon: true
+                }
+            }
+            else {
+                return {
+                    valid: true,
+                    hasSon: false
+                }
             }
         } catch (error) {
             return {
@@ -436,7 +462,10 @@ module.exports = class BookService {
             }
         }
 
+        const code = await Counter.nextSequence('genre')
+
         const genre = new Genre({
+            code,
             name: genreData.name,
             parentId
         })
@@ -456,12 +485,36 @@ module.exports = class BookService {
         }
     }
 
-    async getAllGenres() {
+    async getAllGenres({ page = 1, search = '' } = {}) {
         try {
-            const genres = await Genre.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? (() => {
+                    const regex = { $regex: search, $options: 'i' }
+                    return { $or: [
+                        { name: regex },
+                        { code: regex },
+                    ] }
+                })()
+                : {}
+
+            if (search) {
+                const parentMatches = await Genre.find({ name: { $regex: search, $options: 'i' } }, '_id')
+                const parentIds = parentMatches.map(g => g._id)
+                if (parentIds.length > 0) {
+                    query.$or.push({ parentId: { $in: parentIds } })
+                }
+            }
+
+            const genres = await Genre.find(query).skip(skip).limit(limit).populate('parentId', 'name code')
+            const total = await Genre.countDocuments(query)
+
             return {
                 valid: true,
-                genres
+                genres,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
@@ -505,6 +558,13 @@ module.exports = class BookService {
             }
         }
 
+        if (parentId === genreData.id) {
+            return {
+                valid: false,
+                message: 'Não é possível definir o gênero como pai dele mesmo'
+            }
+        }
+
         const genre = existingGenre.genre
         genre.set({
             name: genreData.name,
@@ -531,6 +591,18 @@ module.exports = class BookService {
         const existingGenre = await this.existingGenre(genreData)
         if (existingGenre && !existingGenre.valid) {
             return existingGenre
+        }
+
+        const hasSon = await this.hasSon(genreData)
+
+        if (hasSon && !hasSon.valid) {
+            return hasSon
+        }
+        else if (hasSon && hasSon.hasSon) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir um gênero com filhos'
+            }
         }
 
         try {

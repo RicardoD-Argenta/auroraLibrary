@@ -43,6 +43,7 @@
 
 .form-control input[type=submit][disabled] {
     background-color: var(--selected-color-disabled);
+    color: #fff;
 }
 
 /* Input de desabilitado */

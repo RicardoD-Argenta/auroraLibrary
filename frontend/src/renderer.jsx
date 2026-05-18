@@ -8,14 +8,19 @@ import Home from './routes/Home.jsx'
 // Book
 
   // Publisher
-import CreatePublisher from './routes/Book/Publisher/CreatePublisher.jsx'
-import ListPublisher from './routes/Book/Publisher/ListPublisher.jsx'
-import EditPublisher from './routes/Book/Publisher/EditPublisher.jsx'
+  import CreatePublisher from './routes/Book/Publisher/CreatePublisher.jsx'
+  import ListPublisher from './routes/Book/Publisher/ListPublisher.jsx'
+  import EditPublisher from './routes/Book/Publisher/EditPublisher.jsx'
 
-// Author
-import CreateAuthor from './routes/Book/Author/CreateAuthor.jsx'
-import ListAuthor from './routes/Book/Author/ListAuthor.jsx'
-import EditAuthor from './routes/Book/Author/EditAuthor.jsx'
+  // Author
+  import CreateAuthor from './routes/Book/Author/CreateAuthor.jsx'
+  import ListAuthor from './routes/Book/Author/ListAuthor.jsx'
+  import EditAuthor from './routes/Book/Author/EditAuthor.jsx'
+
+  // Genre
+  import CreateGenre from './routes/Book/Genre/CreateGenre.jsx'
+  import ListGenre from './routes/Book/Genre/ListGenre.jsx'
+  import GenreEdit from './routes/Book/Genre/GenreEdit.jsx'
 
 // Auth
 import Login from './routes/Auth/Login.jsx'
@@ -72,6 +77,19 @@ const router = createBrowserRouter([
           {
             path: '/book/author/edit',
             element: <EditAuthor />
+          },
+          // Genre
+          {
+            path: '/book/genre/register',
+            element: <CreateGenre />
+          },
+          {
+            path: '/book/genre/list',
+            element: <ListGenre />
+          },
+          {
+            path: '/book/genre/edit',
+            element: <GenreEdit />
           }
         ]
       },

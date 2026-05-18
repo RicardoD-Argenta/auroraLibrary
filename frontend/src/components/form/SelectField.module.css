@@ -1,0 +1,125 @@
+@keyframes popIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0.5;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.selectField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+}
+
+.selectField > label {
+   font-weight: bold;
+   font-size: .9rem;
+}
+
+.fieldRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chip {
+    display: inline-flex;
+    gap: 0.4rem;
+    background-color: var(--selected-color);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.chip span {
+    color: #fff;
+    font-size: 0.8rem;
+}
+
+.chipRemove {
+    background: none;
+    border: none;
+    right: 8%;
+    top: 25%;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.chipRemove:hover {
+    opacity: 0.7;
+}
+
+/* Modal */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+}
+
+.modal {
+    background-color: var(--background-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    animation: popIn 0.15s ease;
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modalHeader h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 0;
+}
+
+.closeBtn:hover {
+    opacity: 0.7;
+}
+
+.modalList {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+
+.listItem {
+    cursor: pointer;
+    user-select: none;
+}
+
+.listItem:hover {
+    background-color: var(--background-color-variant);
+}
