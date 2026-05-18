@@ -1,15 +1,20 @@
 import { Link } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { FaChevronRight, FaChevronDown } from "react-icons/fa6";
+import { UserContext } from '../../context/UserContext.jsx'
 
 import styles from './SideBar.module.css'
 
 const SideBarItem = ({ item, sidebarCollapsed = false }) => {
+  const { auth } = useContext(UserContext)
+  const { user } = auth
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (sidebarCollapsed) setOpen(false)
   }, [sidebarCollapsed])
+
+  if (item.roles && (!user || !item.roles.includes(user.role))) return null
 
   if (item.children) {
     const Icon = item.icon

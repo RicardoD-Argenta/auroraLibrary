@@ -37,6 +37,9 @@ import Login from './routes/Auth/Login.jsx'
   import ListShelf from './routes/Library/Shelf/ListShelf.jsx'
   import EditShelf from './routes/Library/Shelf/EditShelf.jsx'
 
+  // Library
+  import EditLibrary from './routes/Library/Library/EditLibrary.jsx'
+
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import { useContext } from 'react'
 import { UserContext } from './context/UserContext.jsx'
@@ -128,6 +131,16 @@ const router = createBrowserRouter([
           {
             path: '/library/shelf/edit',
             element: <EditShelf />
+          },
+          // Library
+          {
+            element: <PrivateRoute roles={['admin']} />,
+            children: [
+              {
+                path: '/libraries/edit',
+                element: <EditLibrary />
+              }
+            ]
           }
         ]
       },

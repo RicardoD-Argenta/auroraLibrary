@@ -1,0 +1,64 @@
+.card {
+    padding: .8rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    background-color: var(--background-color);
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.label {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text-color);
+}
+
+/* Toggle switch */
+.toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--grey);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    padding: 0;
+    box-shadow: inset 0px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.toggle.on {
+    background: var(--selected-color);
+}
+
+.thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.2s;
+    display: block;
+}
+
+.toggle.on .thumb {
+    transform: translateX(16px);
+}
+
+/* Sub-inputs */
+.fields {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-top: 1px solid var(--background-color-variant);
+    padding-top: 1rem;
+}
