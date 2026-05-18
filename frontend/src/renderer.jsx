@@ -23,7 +23,7 @@ import Login from './routes/Auth/Login.jsx'
   // Genre
   import CreateGenre from './routes/Book/Genre/CreateGenre.jsx'
   import ListGenre from './routes/Book/Genre/ListGenre.jsx'
-  import GenreEdit from './routes/Book/Genre/GenreEdit.jsx'
+  import GenreEdit from './routes/Book/Genre/EditGenre.jsx'
 
 // Library
 
@@ -31,6 +31,11 @@ import Login from './routes/Auth/Login.jsx'
   import CreateSector from './routes/Library/Sector/CreateSector.jsx'
   import ListSector from './routes/Library/Sector/ListSector.jsx'
   import EditSector from './routes/Library/Sector/EditSector.jsx'
+
+  // Shelf
+  import CreateShelf from './routes/Library/Shelf/CreateShelf.jsx'
+  import ListShelf from './routes/Library/Shelf/ListShelf.jsx'
+  import EditShelf from './routes/Library/Shelf/EditShelf.jsx'
 
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import { useContext } from 'react'
@@ -110,6 +115,19 @@ const router = createBrowserRouter([
           {
             path: '/library/sector/edit',
             element: <EditSector />
+          },
+          // Shelf
+          {
+            path: '/library/shelf/register',
+            element: <CreateShelf />
+          },
+          {
+            path: '/library/shelf/list',
+            element: <ListShelf />
+          },
+          {
+            path: '/library/shelf/edit',
+            element: <EditShelf />
           }
         ]
       },

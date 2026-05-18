@@ -80,11 +80,11 @@ const EditGenre = () => {
                         <Input text="ID" type="text" name="id" placeholder="" limit={20} value={genre.code} disabled />
                     </div>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Nome" type="text" name="name" placeholder="" limit={255} value={genre.name} handleOnChange={handleChange} />
+                        <Input text="Nome *" type="text" name="name" placeholder="" limit={255} value={genre.name} handleOnChange={handleChange} />
                     </div>
                     <div className={styles['input-wrapper']}>
                         <SelectField
-                            label="Gênero Pai:"
+                            label="Gênero Pai"
                             renderItem={(item, onSelect) => <GenreItem key={item._id} item={item} onClick={() => onSelect(item)} />}
                             value={genre.parentId}
                             onChange={(item) => setGenre({ ...genre, parentId: item })}

@@ -578,7 +578,7 @@ module.exports = class LibraryController {
     }
 
 
-    // ------------------------ criação de setores ------------------------ //
+    // ------------------------ criação de prateleiras ------------------------ //
     static async registerShelf(req, res) {
         const bodyValidation = emptyBody(req)
         if (!bodyValidation.valid) {
@@ -626,7 +626,10 @@ module.exports = class LibraryController {
     }
 
     static async getAllShelves(req, res) {
-        const result = await libraryService.getAllShelves()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+
+        const result = await libraryService.getAllShelves({ page, search })
         if (!result.valid) {
             return res.status(400).json({
                 message: result.message,
@@ -634,8 +637,9 @@ module.exports = class LibraryController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                shelves: result.shelves
+                shelves: result.shelves,
+                total: result.total,
+                pages: result.pages
             })
         }
     }

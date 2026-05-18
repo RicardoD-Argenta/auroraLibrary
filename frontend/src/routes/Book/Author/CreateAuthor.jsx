@@ -38,7 +38,7 @@ const CreateAuthor = () => {
             <form id="create-author-form" onSubmit={handleSubmit}>
                 <div className={styles['form-control']}>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Nome" type="text" id="name" name="name" placeholder="" limit={255} value={author.name} handleOnChange={handleChange} />
+                        <Input text="Nome *" type="text" id="name" name="name" placeholder="" limit={255} value={author.name} handleOnChange={handleChange} />
                     </div>
                 </div>
             </form>

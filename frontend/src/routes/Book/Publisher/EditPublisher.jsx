@@ -73,7 +73,7 @@ const EditPublisher = () => {
                         <Input text="ID" type="text" name="id" placeholder="" limit={20} value={publisher.code} disabled />
                     </div>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Nome" type="text" name="name" placeholder="" limit={255} value={publisher.name} handleOnChange={handleChange} />
+                        <Input text="Nome *" type="text" name="name" placeholder="" limit={255} value={publisher.name} handleOnChange={handleChange} />
                     </div>
                     
                 </div>

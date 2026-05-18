@@ -4,6 +4,10 @@
     width: 10.5rem;
 }
 
+.header h2 {
+    width: 150%;
+}
+
 .header > * {
     margin-top: .5rem;
 }
