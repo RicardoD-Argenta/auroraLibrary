@@ -42,7 +42,7 @@ const CreateGenre = () => {
             <form id="create-genre-form" onSubmit={handleSubmit}>
                 <div className={styles['form-control']}>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Nome" type="text" id="name" name="name" placeholder="" limit={255} value={genre.name} handleOnChange={handleChange} />
+                        <Input text="Nome *" type="text" id="name" name="name" placeholder="" limit={255} value={genre.name} handleOnChange={handleChange} />
                     </div>
                     <div className={styles['input-wrapper']}>
                         <SelectField

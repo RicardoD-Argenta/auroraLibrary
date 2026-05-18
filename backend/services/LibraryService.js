@@ -286,7 +286,6 @@ module.exports = class LibraryService {
             const sectors = await Sector.find(query).skip(skip).limit(limit)
             const total = await Sector.countDocuments(query)
 
-
             return {
                 valid: true,
                 sectors,
@@ -368,7 +367,7 @@ module.exports = class LibraryService {
     }
 
 
-    // ------------------------ criação de setores ------------------------ //
+    // ------------------------ criação de prateleiras ------------------------ //
     async registeredShelf(shelfData) {
         try {
             const shelf = await Shelf.findOne({
@@ -379,7 +378,7 @@ module.exports = class LibraryService {
             if (shelf) {
                 return {
                     valid: false,
-                    message: 'Estante já cadastrada',
+                    message: 'Prateleira já cadastrada',
                     err: 'shelf-already-registered'
                 }
             }
@@ -388,7 +387,7 @@ module.exports = class LibraryService {
             console.log(error)
             return {
                 valid: false,
-                message: 'Erro ao verificar estante',
+                message: 'Erro ao verificar prateleira',
                 err: error.message
             }
         }
@@ -400,7 +399,7 @@ module.exports = class LibraryService {
             if (!shelf) {
                 return {
                     valid: false,
-                    message: 'Estante não cadastrada',
+                    message: 'Prateleira não cadastrada',
                     err: 'shelf-not-registered'
                 }
             }
@@ -412,7 +411,7 @@ module.exports = class LibraryService {
             console.log(error)
             return {
                 valid: false,
-                message: 'Erro ao verificar estante',
+                message: 'Erro ao verificar prateleira',
                 err: error.message
             }
         }
@@ -424,39 +423,57 @@ module.exports = class LibraryService {
             return registeredShelf
         }
 
+        const code = await Counter.nextSequence('shelf')
+
+        const shelf = new Shelf({
+            code,
+            name: shelfData.name,
+            description: shelfData.description
+        })
         try {
-            const shelf = new Shelf({
-                name: shelfData.name,
-                description: shelfData.description
-            })
             const newShelf = await shelf.save()
             return {
                 valid: true,
-                message: 'Estante cadastrada com sucesso',
+                message: 'Prateleira cadastrada com sucesso',
                 shelf: newShelf
             }
         }
         catch (error) {
             return {
                 valid: false,
-                message: 'Erro ao cadastrar estante',
+                message: 'Erro ao cadastrar prateleira',
                 err: error.message
             }
         }
     }
 
-    async getAllShelves() {
+    async getAllShelves({ page = 1, search = '' } = {}) {
         try {
-            const shelves = await Shelf.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? { $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { code: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
+                ] }
+                : {}
+
+            const shelves = await Shelf.find(query).skip(skip).limit(limit)
+            const total = await Shelf.countDocuments(query)
+
             return {
                 valid: true,
-                shelves
+                shelves,
+                total,
+                pages: Math.ceil(total / limit)
             }
         }
         catch (error) {
             return {
                 valid: false,
-                message: 'Erro ao buscar estantes',
+                message: 'Erro ao buscar prateleiras',
                 err: error.message
              }
         }
@@ -494,13 +511,13 @@ module.exports = class LibraryService {
             const updatedShelf = await shelf.save()
             return {
                 valid: true,
-                message: 'Estante atualizado com sucesso',
+                message: 'Prateleira atualizada com sucesso',
                 shelf: updatedShelf
             }
         } catch (error) {
             return {
                 valid: false,
-                message: 'Erro ao atualizar estante',
+                message: 'Erro ao atualizar prateleira',
                 err: error.message
              }
         }
@@ -516,12 +533,12 @@ module.exports = class LibraryService {
             await Shelf.findByIdAndDelete(shelfData.id)
             return {
                 valid: true,
-                message: 'Estante deletado com sucesso'
+                message: 'Prateleira deletada com sucesso'
              }
         } catch (error) {
             return {
                 valid: false,
-                message: 'Erro ao deletar estante',
+                message: 'Erro ao deletar prateleira',
                 err: error.message
             }
         }
