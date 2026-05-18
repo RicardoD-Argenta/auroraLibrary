@@ -1,13 +1,12 @@
-// imports
-
 // models
-const Member = require('../models/Library/Member')
-const Sector = require('../models/Library/Sector')
-const Shelf = require('../models/Library/Shelf')
-const Library = require('../models/Library/Library')
-const LibraryParams = require('../models/Library/LibraryParams')
+    const Member = require('../models/Library/Member')
+    const Sector = require('../models/Library/Sector')
+    const Shelf = require('../models/Library/Shelf')
+    const Library = require('../models/Library/Library')
+    const LibraryParams = require('../models/Library/LibraryParams')
 
 // helpers
+    const Counter = require('../models/Counter')
 
 
 module.exports = class LibraryService {
@@ -248,11 +247,14 @@ module.exports = class LibraryService {
             return registeredSector
         }
 
+        const code = await Counter.nextSequence('sector')
+
+        const sector = new Sector({
+            code,
+            name: sectorData.name,
+            description: sectorData.description
+        })
         try {
-            const sector = new Sector({
-                name: sectorData.name,
-                description: sectorData.description
-            })
             const newSector = await sector.save()
             return {
                 valid: true,
@@ -268,12 +270,28 @@ module.exports = class LibraryService {
         }
     }
 
-    async getAllSectors() {
+    async getAllSectors({ page = 1, search = '' } = {}) {
         try {
-            const sectors = await Sector.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? { $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { code: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
+                ] }
+                : {}
+
+            const sectors = await Sector.find(query).skip(skip).limit(limit)
+            const total = await Sector.countDocuments(query)
+
+
             return {
                 valid: true,
-                sectors
+                sectors,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {

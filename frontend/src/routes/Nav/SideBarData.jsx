@@ -66,14 +66,14 @@ export const sidebarData = [
       },
       { label: 'Setores',
         children: [
-          { label: 'Novo', path: '/sets/new' },
-          { label: 'Listar', path: '/sets' },
+          { label: 'Novo', path: '/library/sector/register' },
+          { label: 'Listar', path: '/library/sector/list' },
         ]
       },
       { label: 'Prateleiras',
         children: [
-          { label: 'Novo', path: '/shelves/new' },
-          { label: 'Listar', path: '/shelves' },
+          { label: 'Novo', path: '/library/shelf/register' },
+          { label: 'Listar', path: '/library/shelf/list' },
         ]
       },
       { label: 'Usuários',

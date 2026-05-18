@@ -450,8 +450,10 @@ module.exports = class LibraryController {
     }
 
     static async getAllSectors(req, res) {
-        const result = await libraryService.getAllSectors()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
 
+        const result = await libraryService.getAllSectors({ page, search })
         if (!result.valid) {
             return res.status(400).json({
                 message: result.message,
@@ -459,8 +461,9 @@ module.exports = class LibraryController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                sectors: result.sectors
+                sectors: result.sectors,
+                total: result.total,
+                pages: result.pages
             })
         }
     }

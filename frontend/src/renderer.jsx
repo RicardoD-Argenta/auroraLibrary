@@ -5,6 +5,9 @@ import App from './App.jsx'
 import ErrorPage from './routes/ErrorPage.jsx'
 import Home from './routes/Home.jsx'
 
+// Auth
+import Login from './routes/Auth/Login.jsx'
+
 // Book
 
   // Publisher
@@ -22,8 +25,12 @@ import Home from './routes/Home.jsx'
   import ListGenre from './routes/Book/Genre/ListGenre.jsx'
   import GenreEdit from './routes/Book/Genre/GenreEdit.jsx'
 
-// Auth
-import Login from './routes/Auth/Login.jsx'
+// Library
+
+  // Sector
+  import CreateSector from './routes/Library/Sector/CreateSector.jsx'
+  import ListSector from './routes/Library/Sector/ListSector.jsx'
+  import EditSector from './routes/Library/Sector/EditSector.jsx'
 
 import { createBrowserRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom'
 import { useContext } from 'react'
@@ -90,6 +97,19 @@ const router = createBrowserRouter([
           {
             path: '/book/genre/edit',
             element: <GenreEdit />
+          },
+          // Sector
+          {
+            path: '/library/sector/register',
+            element: <CreateSector />
+          },
+          {
+            path: '/library/sector/list',
+            element: <ListSector />
+          },
+          {
+            path: '/library/sector/edit',
+            element: <EditSector />
           }
         ]
       },
