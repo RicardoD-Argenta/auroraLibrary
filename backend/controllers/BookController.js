@@ -419,7 +419,10 @@ module.exports = class BookController {
     }
 
     static async getAllGenres(req, res) {
-        const result = await bookService.getAllGenres()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+
+        const result = await bookService.getAllGenres({ page, search })
         if (!result.valid) {
             return res.status(400).json({
                 message: result.message,
@@ -427,8 +430,9 @@ module.exports = class BookController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                genres: result.genres
+                genres: result.genres,
+                total: result.total,
+                pages: result.pages
             })
         }
     }
