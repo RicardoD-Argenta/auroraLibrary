@@ -137,7 +137,7 @@ const router = createBrowserRouter([
             element: <PrivateRoute roles={['admin']} />,
             children: [
               {
-                path: '/libraries/edit',
+                path: '/library/edit',
                 element: <EditLibrary />
               }
             ]
