@@ -84,7 +84,7 @@ export const sidebarData = [
       },
       { label: 'Biblioteca', roles: ['admin'],
         children: [
-          { label: 'Editar', path: '/libraries/edit', },
+          { label: 'Editar', path: '/library/edit', },
         ]
       }
     ]
