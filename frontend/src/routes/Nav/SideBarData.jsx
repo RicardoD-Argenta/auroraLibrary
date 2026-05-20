@@ -78,8 +78,8 @@ export const sidebarData = [
       },
       { label: 'Usuários', roles: ['admin'],
         children: [
-          { label: 'Novo', path: '/users/new' },
-          { label: 'Listar', path: '/users' },
+          { label: 'Novo', path: '/user/register' },
+          { label: 'Listar', path: '/user/list' },
         ]
       },
       { label: 'Biblioteca', roles: ['admin'],

@@ -84,9 +84,7 @@ module.exports = class UserController {
         } else {
             return res.status(200).json({
                 message: result.message,
-                token: result.token,
-                userId: result.userId,
-                userRole: result.userRole
+                user: result.user
             })
         }
 
@@ -142,7 +140,10 @@ module.exports = class UserController {
     }
 
     static async getAllUsers(req, res) {
-        const result = await userService.getAllUsers()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+
+        const result = await userService.getAllUsers({ page, search })
         if(!result.valid) {
             return res.status(400).json({
                 message: result.message,
@@ -150,8 +151,9 @@ module.exports = class UserController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                users: result.users
+                users: result.users,
+                total: result.total,
+                pages: result.pages
             })
         }
     }
@@ -226,7 +228,7 @@ module.exports = class UserController {
 
             // verifica se a senha existe e tem entre 6 e 255 caracteres
             const passwordsAreValid = [password, oldPassword].every(
-                (value) => value.length >= 6 && value.length <= 255
+                (value) => value && value.length >= 6 && value.length <= 255
             )
 
             if (!passwordsAreValid) {
@@ -286,6 +288,13 @@ module.exports = class UserController {
 
         const userId = req.authenticatedUserId
         const userRole = req.authenticatedUserRole
+
+        if (userId === id) {
+            return res.status(400).json({
+                message: 'Você não pode deletar seu próprio usuário',
+                err: 'delete-self-not-valid'
+            })
+        }
 
         const result = await userService.deleteUser({
             id,

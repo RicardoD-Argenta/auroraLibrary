@@ -1,6 +1,6 @@
 import Styles from './Input.module.css'
 
-const Input = ({ type, text, name, placeholder, value, handleOnChange, multiple, disabled, limit, form, number }) => {
+const Input = ({ type, text, name, placeholder, value, handleOnChange, multiple, disabled, limit, form, number, min }) => {
 
   function handleNumberChange(e) {
     let val = e.target.value
@@ -25,6 +25,7 @@ const Input = ({ type, text, name, placeholder, value, handleOnChange, multiple,
             {...(number ? { inputMode: 'decimal' } : {})}
             {...(multiple ? { multiple } : '')}
             {...(disabled ? { disabled }  : '')}
+            {...(min ? { minLength: min } : '')}
             {...(limit ? { maxLength: limit } : '')}
         />
     </div>
