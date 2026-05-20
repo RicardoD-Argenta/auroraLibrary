@@ -8,6 +8,11 @@ import Home from './routes/Home.jsx'
 // Auth
 import Login from './routes/Auth/Login.jsx'
 
+  // User
+  import CreateUser from './routes/Auth/User/CreateUser.jsx'
+  import ListUsers from './routes/Auth/User/ListUsers.jsx'
+  import EditUser from './routes/Auth/User/EditUser.jsx'
+
 // Book
 
   // Publisher
@@ -132,6 +137,11 @@ const router = createBrowserRouter([
             path: '/library/shelf/edit',
             element: <EditShelf />
           },
+          // Users
+          {
+            path: '/user/register',
+            element: <CreateUser />
+          },
           // Library
           {
             element: <PrivateRoute roles={['admin']} />,
@@ -139,6 +149,14 @@ const router = createBrowserRouter([
               {
                 path: '/library/edit',
                 element: <EditLibrary />
+              },
+              {
+                path: '/user/list',
+                element: <ListUsers />
+              },
+              {
+                path: '/user/edit',
+                element: <EditUser />
               }
             ]
           }

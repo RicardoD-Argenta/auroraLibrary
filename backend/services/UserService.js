@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 
 // models
 const User = require('../models/User/User')
+const Counter = require('../models/Counter')
 
 // helpers
 const createUserToken = require('../helpers/createUserToken')
@@ -78,7 +79,10 @@ module.exports = class UserService {
         const salt = await bcrypt.genSalt(12)
         const passwordHash = await bcrypt.hash(userData.password, salt)
 
+        const code = await Counter.nextSequence('user')
+
         const user = new User({
+            code: code,
             name: userData.name,
             login: userData.login,
             password: passwordHash,
@@ -88,12 +92,11 @@ module.exports = class UserService {
         try {
             const newUser = await user.save()
             const token = createUserToken(newUser)
+            const { password: _, ...userWithoutPassword } = newUser.toObject()
             return { 
                 valid: true,
                 message: 'Cadastro realizado com sucesso',
-                token: token,
-                userId: newUser._id,
-                userRole: newUser.role
+                user: userWithoutPassword
             }
         } catch (error) {
             return {
@@ -144,12 +147,26 @@ module.exports = class UserService {
         }
     }
 
-    async getAllUsers() {
+    async getAllUsers({ page = 1, search = '' } = {}) {
         try {
-            const users = await User.find({}, '-password')
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? { $or: [
+                    { code: { $regex: search, $options: 'i' } },
+                    { name: { $regex: search, $options: 'i' } },
+                ] }
+                : {}
+
+            const users = await User.find(query, '-password -login').skip(skip).limit(limit)
+            const total = await User.countDocuments(query)
+
             return {
                 valid: true,
-                users
+                users,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
@@ -228,7 +245,7 @@ module.exports = class UserService {
             return existingUser
         }
 
-        if (existingUser.user.role === 'admin') {
+        if (existingUser.user.role === 'admin' && userData.userRole !== 'admin') {
             return {
                 valid: false,
                 message: 'Acesso negado',
