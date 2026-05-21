@@ -70,6 +70,8 @@
     z-index: 100;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     animation: dropIn 0.12s ease;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 @keyframes dropIn {

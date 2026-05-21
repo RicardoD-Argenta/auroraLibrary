@@ -1,0 +1,63 @@
+.itemContainer,
+.contentContainer,
+.labelContainer {
+    width: 100%;
+}
+
+.itemContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.contentContainer {
+    max-width: 100%;
+    gap: .3rem;
+    display: flex;
+    flex-direction: column;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.labelContainer {
+    display: flex;
+    gap: .3rem;
+}
+
+.actionsContainer {
+    padding: 0 0 0 1rem;
+}
+
+.code {
+    font-size: .8rem;
+    font-weight: bold;
+}
+
+
+.label {
+    font-size: .8rem;
+    font-weight: bold;
+    min-width: 6.5rem;
+}
+
+.name {
+    font-size: .9rem;
+    width: 100%;
+    min-width: 100px;
+    margin-top: -2px;
+}
+
+.labelContainer {
+    border-bottom: 1px solid var(--text-color-disabled);
+}
+
+.labelContainer:last-child {
+    border-bottom: none;
+}
+
+@media screen and (max-width: 720px) {
+    .itemContainer {
+        padding: 0 2rem 0 0;
+    }
+    
+}

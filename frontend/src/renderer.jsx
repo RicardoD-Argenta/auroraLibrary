@@ -32,6 +32,11 @@ import Login from './routes/Auth/Login.jsx'
 
 // Library
 
+  // Member
+  import CreateMember from './routes/Library/Member/CreateMember.jsx'
+  import ListMember from './routes/Library/Member/ListMember.jsx'
+  import EditMember from './routes/Library/Member/EditMember.jsx'
+
   // Sector
   import CreateSector from './routes/Library/Sector/CreateSector.jsx'
   import ListSector from './routes/Library/Sector/ListSector.jsx'
@@ -110,6 +115,19 @@ const router = createBrowserRouter([
           {
             path: '/book/genre/edit',
             element: <GenreEdit />
+          },
+          // Member
+          {
+            path: '/library/member/register',
+            element: <CreateMember />
+          },
+          {
+            path: '/library/member/list',
+            element: <ListMember />
+          },
+          {
+            path: '/library/member/edit',
+            element: <EditMember />
           },
           // Sector
           {

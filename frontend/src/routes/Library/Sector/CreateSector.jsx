@@ -42,7 +42,7 @@ const CreateSector = () => {
                         <Input text="Nome *" type="text" id="name" name="name" placeholder="" limit={255} value={sector.name} handleOnChange={handleChange} />
                     </div>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Descrição" type="text" id="description" name="description" placeholder="" limit={255} value={sector.description} handleOnChange={handleChange} />
+                        <Input text="Descrição" type="textarea" id="description" name="description" placeholder="" limit={255} value={sector.description} handleOnChange={handleChange} />
                     </div>
                 </div>
             </form>

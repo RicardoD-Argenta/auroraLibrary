@@ -60,8 +60,8 @@ export const sidebarData = [
     children: [
       { label: 'Membros', 
         children: [
-          { label: 'Novo', path: '/members/new' },
-          { label: 'Listar', path: '/members' },
+          { label: 'Novo', path: '/library/member/register' },
+          { label: 'Listar', path: '/library/member/list' },
         ]
       },
       { label: 'Setores',

@@ -39,10 +39,10 @@ const CreateShelf = () => {
             <form id="create-shelf-form" onSubmit={handleSubmit}>
                 <div className={styles['form-control']}>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Nome *" type="text" id="name" name="name" placeholder="" limit={255} value={shelf.name} handleOnChange={handleChange} />
+                        <Input text="Nome *" type="text" name="name" placeholder="" limit={255} value={shelf.name} handleOnChange={handleChange} />
                     </div>
                     <div className={styles['input-wrapper']}>
-                        <Input text="Descrição" type="text" id="description" name="description" placeholder="" limit={255} value={shelf.description} handleOnChange={handleChange} />
+                        <Input text="Descrição" type="textarea" name="description" placeholder="" limit={255} value={shelf.description} handleOnChange={handleChange} />
                     </div>
                 </div>
             </form>

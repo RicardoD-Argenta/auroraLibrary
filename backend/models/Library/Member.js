@@ -4,6 +4,12 @@ const { Schema } = mongoose
 const Member = mongoose.model(
     'Member',
     new Schema({
+        code: {
+            type: String,
+            required: true,
+            unique: true,
+            maxlength: 20
+        },
         name: {
             type: String,
             required: true,

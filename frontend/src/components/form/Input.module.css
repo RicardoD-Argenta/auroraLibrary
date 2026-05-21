@@ -46,6 +46,24 @@
     color: #fff;
 }
 
+/* Textarea */
+.form-control .textarea {
+    padding: 2px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    resize: vertical;
+    min-height: calc(1lh + 3rem);
+    font-family: inherit;
+    font-size: .83rem;
+    max-height: 150px;
+}
+
+.form-control .textarea:focus {
+    outline: none;
+    border-color: var(--selected-color);
+}
+
 /* Input de desabilitado */
 .form-control.disabled :disabled {
     background-color: var(--grey);

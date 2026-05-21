@@ -26,18 +26,31 @@ const ParamField = ({ label, value, onChange, fields }) => {
             </div>
             {fields && value.active && (
                 <div className={styles.fields}>
-                    {fields.map(field => (
-                        <Input
-                            key={field.name}
-                            text={field.label}
-                            type={field.type ?? 'text'}
-                            name={field.name}
-                            placeholder={field.placeholder ?? ''}
-                            value={value[field.name] ?? ''}
-                            handleOnChange={handleFieldChange}
-                            number={field.number}
-                        />
-                    ))}
+                    {fields.map(field => {
+                        if (field.component) {
+                            const Comp = field.component
+                            return (
+                                <Comp
+                                    key={field.name}
+                                    name={field.name}
+                                    value={value[field.name] ?? ''}
+                                    handleOnChange={handleFieldChange}
+                                />
+                            )
+                        }
+                        return (
+                            <Input
+                                key={field.name}
+                                text={field.label}
+                                type={field.type ?? 'text'}
+                                name={field.name}
+                                placeholder={field.placeholder ?? ''}
+                                value={value[field.name] ?? ''}
+                                handleOnChange={handleFieldChange}
+                                number={field.number}
+                            />
+                        )
+                    })}
                 </div>
             )}
         </div>

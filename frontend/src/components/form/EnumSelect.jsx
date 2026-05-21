@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from './EnumSelect.module.css'
 
-const EnumSelect = ({ text, name, value, handleOnChange, options = [], disabled }) => {
+const EnumSelect = ({ text, name, value, handleOnChange, options = [], disabled, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [focusedIndex, setFocusedIndex] = useState(-1)
     const wrapperRef = useRef(null)
@@ -71,7 +71,7 @@ const EnumSelect = ({ text, name, value, handleOnChange, options = [], disabled 
             >
                 {selectedOption
                     ? <span className={styles['selected-label']}>{selectedOption.label}</span>
-                    : <span className={styles.placeholder}>Selecione...</span>
+                    : <span className={styles.placeholder}>{placeholder ?? 'Selecione...'}</span>
                 }
                 <span className={`${styles.arrow}${isOpen ? ` ${styles.open}` : ''}`}>▼</span>
             </div>
