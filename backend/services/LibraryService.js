@@ -77,7 +77,10 @@ module.exports = class LibraryService {
             return existingMember
         }
 
+        const code = await Counter.nextSequence('member')
+
         const member = new Member({
+            code,
             name: memberData.name,
             email: memberData.email,
             phone: memberData.phone,
@@ -102,12 +105,29 @@ module.exports = class LibraryService {
         }
     }
 
-    async getAllMembers() {
+    async getAllMembers({ page = 1, search = '' } = {}) {
         try {
-            const members = await Member.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            const query = search
+                ? { $or: [
+                    { name: { $regex: search, $options: 'i' } },
+                    { code: { $regex: search, $options: 'i' } },
+                    { email: { $regex: search, $options: 'i' } },
+                    { phone: { $regex: search, $options: 'i' } },
+                    { observations: { $regex: search, $options: 'i' } }
+                ] }
+                : {}
+
+            const members = await Member.find(query).skip(skip).limit(limit)
+            const total = await Member.countDocuments(query)
+            
             return {
                 valid: true,
-                members
+                members,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {

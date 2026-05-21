@@ -28,6 +28,9 @@ module.exports = class LibraryController {
         const studentData = student ?? {}
         const memberData = member ?? {}
 
+        studentData.isStudent = String(studentData.isStudent)
+        memberData.isMember = String(memberData.isMember)
+
         // verifica os campos obrigatórios
         const fieldsConfig = {
             required: ['name', 'student.isStudent', 'member.isMember'],
@@ -168,7 +171,10 @@ module.exports = class LibraryController {
     }
 
     static async getAllMembers(req, res) {
-        const result = await libraryService.getAllMembers()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+
+        const result = await libraryService.getAllMembers({ page, search })
 
         if (!result.valid) {
             return res.status(400).json({
@@ -177,8 +183,9 @@ module.exports = class LibraryController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                members: result.members
+                members: result.members,
+                total: result.total,
+                pages: result.pages
             })
         }
     }
@@ -232,6 +239,9 @@ module.exports = class LibraryController {
         const { name, email, phone, student, member, observations } = req.body
         const studentData = student ?? {}
         const memberData = member ?? {}
+
+        studentData.isStudent = String(studentData.isStudent)
+        memberData.isMember = String(memberData.isMember)
 
         // verifica os campos obrigatórios
         const fieldsConfig = {
