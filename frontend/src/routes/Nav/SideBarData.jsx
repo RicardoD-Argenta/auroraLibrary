@@ -19,14 +19,14 @@ export const sidebarData = [
     children: [
       { label: 'Exemplares',
           children: [
-            { label: 'Novo', path: '/books/exemplars/new' },
-            { label: 'Listar', path: '/books/exemplars' },
+            { label: 'Novo', path: '/books/bookcopy/register' },
+            { label: 'Listar', path: '/books/bookcopy/list' },
           ]
        },
       { label: 'Livros',
           children: [
-            { label: 'Novo', path: '/books/new' },
-            { label: 'Listar', path: '/books/exemplar' },
+            { label: 'Novo', path: '/book/book/register' },
+            { label: 'Listar', path: '/book/book/list' },
           ]
       },
       {

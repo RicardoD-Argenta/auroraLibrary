@@ -5,6 +5,12 @@ const Book = mongoose.model(
     'Book',
     new Schema(
         {
+        code: {
+            type: String,
+            required: true,
+            unique: true,
+            maxlength: 20
+        },
         title: {
             type: String,
             maxlength: 255,

@@ -47,6 +47,25 @@
     margin-top: -2px;
 }
 
+/* Clickable */
+.clickable {
+    cursor: pointer;
+    width: 100%;
+}
+
+.clickable:hover {
+    background-color: var(--grey) !important;
+}
+
+
+.clickable .labelContainer {
+    border-bottom: 1px solid var(--text-color-disabled);
+}
+
+.clickable .labelContainer:last-child {
+    border-bottom: none;
+}
+
 @media screen and (max-width: 690px) {
     .itemContainer {
         padding: 0 1.5rem 0 0;

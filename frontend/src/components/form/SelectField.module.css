@@ -27,6 +27,10 @@
     gap: 0.5rem;
 }
 
+.fieldRowWrap {
+    flex-wrap: wrap;
+}
+
 .chip {
     display: inline-flex;
     gap: 0.4rem;

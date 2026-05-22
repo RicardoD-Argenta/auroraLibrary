@@ -610,6 +610,14 @@ module.exports = class BookController {
         const okIds = objectIdValidation(req, res)
         if (!okIds) return
 
+        // verifica se authorsId e genresId não são arrays vazios
+        if (!Array.isArray(authorsId) || authorsId.length === 0) {
+            return res.status(400).json({ message: 'Informe ao menos um autor', err: 'empty-authors' })
+        }
+        if (!Array.isArray(genresId) || genresId.length === 0) {
+            return res.status(400).json({ message: 'Informe ao menos um gênero', err: 'empty-genres' })
+        }
+
         // verifica se o ano é válido
         const resultYear = validateYear(year)
         if (!resultYear.valid) {
@@ -658,7 +666,10 @@ module.exports = class BookController {
     }
 
     static async getAllBooks(req, res) {
-        const result = await bookService.getAllBooks()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+
+        const result = await bookService.getAllBooks(page, search)
         if (!result.valid) {
             return res.status(400).json({
                 message: result.message,
@@ -666,8 +677,9 @@ module.exports = class BookController {
             })
         } else {
             return res.status(200).json({
-                message: result.message,
-                books: result.books
+                books: result.books,
+                total: result.total,
+                pages: result.pages
             })
         }
     }

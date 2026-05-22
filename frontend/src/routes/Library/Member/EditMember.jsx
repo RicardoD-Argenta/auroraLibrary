@@ -67,40 +67,40 @@ const EditMember = () => {
     }
 
     useEffect(() => {
-            const memberId = new URLSearchParams(window.location.search).get('id')
-            if (memberId) {
-                const fetchMember = async () => {
-                    try {
-                        const data = await getMember(memberId)
-                        setMember({
-                            _id: data._id,
-                            name: data.name ?? '',
-                            email: data.email ?? '',
-                            phone: data.phone ?? '',
-                            student: {
-                                active: data.student?.isStudent ?? false,
-                                studentClass: data.student?.studentClass ?? '',
-                            },
-                            member: {
-                                active: data.member?.isMember ?? false,
-                                memberSince: data.member?.memberSince
-                                    ? new Date(data.member.memberSince).toISOString().slice(0, 10)
-                                    : '',
-                            },
-                            observations: data.observations ?? '',
-                        })
-                    } catch {
-                        navigate('/library/member/list')
-                    }
+        const memberId = new URLSearchParams(window.location.search).get('id')
+        if (memberId) {
+            const fetchMember = async () => {
+                try {
+                    const data = await getMember(memberId)
+                    setMember({
+                        _id: data._id,
+                        name: data.name ?? '',
+                        email: data.email ?? '',
+                        phone: data.phone ?? '',
+                        student: {
+                            active: data.student?.isStudent ?? false,
+                            studentClass: data.student?.studentClass ?? '',
+                        },
+                        member: {
+                            active: data.member?.isMember ?? false,
+                            memberSince: data.member?.memberSince
+                                ? new Date(data.member.memberSince).toISOString().slice(0, 10)
+                                : '',
+                        },
+                        observations: data.observations ?? '',
+                    })
+                } catch {
+                    navigate('/library/member/list')
                 }
-                fetchMember()
-            } else {
-                navigate('/library/member/list')
             }
-        }, [])
-    
-    
-        if (loading) return <div>Carregando...</div>
+            fetchMember()
+        } else {
+            navigate('/library/member/list')
+        }
+    }, [])
+
+
+    if (loading) return <div>Carregando...</div>
 
   return (
     <div>

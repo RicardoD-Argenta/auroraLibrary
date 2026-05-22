@@ -10,7 +10,7 @@ import { UserContext } from '../../context/UserContext.jsx'
 
 import styles from './Login.module.css'
 
-import logo from '../../../public/auroraFull.svg'
+import logo from '../../assets/img/auroraFull.svg'
 
 const Login = () => {
 
