@@ -8,7 +8,7 @@ import ListActions from '../../../components/lists/ListActions'
 import usePublisher from '../../../hooks/usePublisher'
 
 
-const PublisherItem = ({ item, onDeleteSuccess }) => {
+const PublisherItem = ({ item, onClick, onDeleteSuccess }) => {
     const { deletePublisher } = usePublisher()
     const navigate = useNavigate()
 
@@ -19,6 +19,21 @@ const PublisherItem = ({ item, onDeleteSuccess }) => {
 
     async function handleEdit(publisherId) {
         navigate(`/book/publisher/edit?id=${publisherId}`)
+    }
+    if (onClick) {
+        return (
+            <li className={styles.clickable} onClick={onClick}>
+                <div className={styles.itemContainer}>
+                    <div className={styles.contentContainer}>
+                        <span className={styles.code}>ID: {item.code}</span>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Nome:</span>
+                            <span className={styles.name}>{item.name}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        )
     }
 
     return (

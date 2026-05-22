@@ -8,7 +8,7 @@ import ListActions from '../../../components/lists/ListActions'
 import useAuthor from '../../../hooks/useAuthor'
 
 
-const AuthorItem = ({ item, onDeleteSuccess }) => {
+const AuthorItem = ({ item, onClick, onDeleteSuccess }) => {
     const { deleteAuthor } = useAuthor()
     const navigate = useNavigate()
 
@@ -19,6 +19,22 @@ const AuthorItem = ({ item, onDeleteSuccess }) => {
 
     async function handleEdit(authorId) {
         navigate(`/book/author/edit?id=${authorId}`)
+    }
+
+    if (onClick) {
+        return (
+            <li className={styles.clickable} onClick={onClick}>
+                <div className={styles.itemContainer}>
+                    <div className={styles.contentContainer}>
+                        <span className={styles.code}>ID: {item.code}</span>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Nome:</span>
+                            <span className={styles.name}>{item.name}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        )
     }
 
     return (

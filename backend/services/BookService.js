@@ -625,14 +625,17 @@ module.exports = class BookService {
     async registeredBook(bookData) {
         try {
             const book = await Book.findOne({
-                title: bookData.title,
-                isbn: bookData.isbn,
+                $or: [
+                    { title: bookData.title },
+                    { isbn: bookData.isbn },
+                ],
                 _id: { $ne: bookData.id }
             })
             if (book) {
+                const reason = book.isbn === bookData.isbn ? 'ISBN já cadastrado' : 'Título já cadastrado'
                 return {
                     valid: false,
-                    message: 'Livro já cadastrado',
+                    message: reason,
                     err: 'book-already-registered'
                 }
             }
@@ -707,7 +710,10 @@ module.exports = class BookService {
             }
         }
 
+        const code = await Counter.nextSequence('book')
+
         const book = new Book({
+            code,
             title: bookData.title,
             subtitle: bookData.subtitle,
             authorsId: bookData.authorsId,
@@ -738,12 +744,49 @@ module.exports = class BookService {
         }
     }
 
-    async getAllBooks() {
+    async getAllBooks(page = 1, search = '') {
         try {
-            const books = await Book.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            let query = {}
+
+            if (search) {
+                const regex = { $regex: search, $options: 'i' }
+
+                const [authorMatches, publisherMatches, genreMatches] = await Promise.all([
+                    Author.find({ name: regex }, '_id'),
+                    Publisher.find({ name: regex }, '_id'),
+                    Genre.find({ name: regex }, '_id'),
+                ])
+
+                query.$or = [
+                    { title: regex },
+                    { subtitle: regex },
+                    { language: regex },
+                    { isbn: regex },
+                    { edition: regex },
+                    { year: regex },
+                    { description: regex },
+                    { authorsId: { $in: authorMatches.map(a => a._id) } },
+                    { publisherId: { $in: publisherMatches.map(p => p._id) } },
+                    { genresId: { $in: genreMatches.map(g => g._id) } },
+                ]
+            }
+
+            const books = await Book.find(query)
+                .populate('authorsId', 'name')
+                .populate('publisherId', 'name')
+                .populate('genresId', 'name')
+                .skip(skip)
+                .limit(limit)
+            const total = await Book.countDocuments(query)
+
             return {
                 valid: true,
-                books
+                books,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
@@ -759,9 +802,13 @@ module.exports = class BookService {
         if (existingBook && !existingBook.valid) {
             return existingBook
         }
+        const book = await Book.findById(bookData.id)
+            .populate('authorsId', 'name')
+            .populate('publisherId', 'name')
+            .populate('genresId', 'name')
         return {
             valid: true,
-            book: existingBook.book
+            book
         }
     }
 

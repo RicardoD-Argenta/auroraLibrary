@@ -7,7 +7,7 @@ import Pagination from '../lists/Pagination'
 
 import styles from './SelectField.module.css'
 
-const SelectField = ({ label, value, onChange, fetchItems, getLabel, renderItem }) => {
+const SelectField = ({ label, value, onChange, fetchItems, getLabel, renderItem, multi = false, maxItems = Infinity }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [items, setItems] = useState([])
     const [search, setSearch] = useState('')
@@ -46,25 +46,51 @@ const SelectField = ({ label, value, onChange, fetchItems, getLabel, renderItem 
     }
 
     function handleSelect(item) {
-        onChange(item)
+        if (multi) {
+            if (!value.some(i => i._id === item._id)) {
+                onChange([...value, item])
+            }
+        } else {
+            onChange(item)
+        }
         handleClose()
     }
 
-    function handleRemove() {
-        onChange(null)
+    function handleRemove(item) {
+        if (multi) {
+            onChange(value.filter(i => i._id !== item._id))
+        } else {
+            onChange(null)
+        }
     }
+
+    const canAddMore = multi ? value.length < maxItems : !value
 
     return (
         <div className={styles.selectField}>
             <label>{label}</label>
-            <div className={styles.fieldRow}>
-                {value ? (
-                    <div className={styles.chip}>
-                        <span>{getLabel(value)}</span>
-                        <button type="button" className={styles.chipRemove} onClick={handleRemove}>×</button>
-                    </div>
+            <div className={`${styles.fieldRow} ${multi ? styles.fieldRowWrap : ''}`}>
+                {multi ? (
+                    <>
+                        {value.map(item => (
+                            <div key={item._id} className={styles.chip}>
+                                <span>{getLabel(item)}</span>
+                                <button type="button" className={styles.chipRemove} onClick={() => handleRemove(item)}>×</button>
+                            </div>
+                        ))}
+                        {canAddMore && (
+                            <Button type="button" variant="submit" onClick={handleOpen}>+</Button>
+                        )}
+                    </>
                 ) : (
-                    <Button type="button" variant="submit" onClick={handleOpen}>+</Button>
+                    value ? (
+                        <div className={styles.chip}>
+                            <span>{getLabel(value)}</span>
+                            <button type="button" className={styles.chipRemove} onClick={() => handleRemove(value)}>×</button>
+                        </div>
+                    ) : (
+                        <Button type="button" variant="submit" onClick={handleOpen}>+</Button>
+                    )
                 )}
             </div>
 
