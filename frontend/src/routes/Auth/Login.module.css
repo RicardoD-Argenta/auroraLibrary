@@ -16,10 +16,14 @@
     /* rgba(121, 84, 216, 0.2) 0px 7px 29px 0px; cor roxa */
 }
 
-.form-container h2{
-    font-size: 1.5rem;
+.image-container{
     margin-bottom: 2rem;
-    text-align: left;
+    text-align: center;
+}
+
+.image-container img {
+    width: 75%;
+    height: auto;
 }
 
 /* Form */

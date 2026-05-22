@@ -10,6 +10,8 @@ import { UserContext } from '../../context/UserContext.jsx'
 
 import styles from './Login.module.css'
 
+import logo from '../../../public/auroraFull.svg'
+
 const Login = () => {
 
   const [user, setUser] = useState({
@@ -34,7 +36,9 @@ const Login = () => {
   return (
     <div className={styles['login-page']}>
     <section className={styles['form-container']}>
-      <h2>Login</h2>
+      <div className={styles['image-container']}>
+        <img src={logo} alt="Aurora Logo" />
+      </div>
       <form onSubmit={handleSubmit}>
         <div className={styles['form-control']}>
           <label htmlFor="login">Usuário</label>
