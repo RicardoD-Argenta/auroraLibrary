@@ -40,7 +40,7 @@
     min-width: 5.5rem;
 }
 
-.labelPublication {
+.labelVariant {
     font-size: .8rem;
     font-weight: bold;
     min-width: 5.5rem;
@@ -60,6 +60,25 @@
 }
 
 .labelContainer:last-child {
+    border-bottom: none;
+}
+
+/* Clickable */
+.clickable {
+    cursor: pointer;
+    width: 100%;
+}
+
+.clickable:hover {
+    background-color: var(--grey) !important;
+}
+
+
+.clickable .labelContainer {
+    border-bottom: 1px solid var(--text-color-disabled);
+}
+
+.clickable .labelContainer:last-child {
     border-bottom: none;
 }
 

@@ -15,6 +15,11 @@ import Login from './routes/Auth/Login.jsx'
 
 // Book
 
+  // BookCopy
+  import CreateBookCopy from './routes/Book/BookCopy/CreateBookCopy.jsx'
+  import ListBookCopy from './routes/Book/BookCopy/ListBookCopy.jsx'
+  import EditBookCopy from './routes/Book/BookCopy/EditBookCopy.jsx'
+
   // Book
   import CreateBook from './routes/Book/Book/CreateBook.jsx'
   import ListBook from './routes/Book/Book/ListBook.jsx'
@@ -81,6 +86,19 @@ const router = createBrowserRouter([
           {
             path: '/',
             element: <Home />
+          },
+          // BookCopy
+          {
+            path: '/book/bookcopy/register',
+            element: <CreateBookCopy />
+          },
+          {
+            path: '/book/bookcopy/list',
+            element: <ListBookCopy />
+          },
+          {
+            path: '/book/bookcopy/edit',
+            element: <EditBookCopy />
           },
           // Books
           {

@@ -8,7 +8,7 @@ import ListActions from '../../../components/lists/ListActions'
 import useSector from '../../../hooks/useSector'
 
 
-const SectorItem = ({ item, onDeleteSuccess }) => {
+const SectorItem = ({ item, onClick, onDeleteSuccess }) => {
     const { deleteSector } = useSector()
     const navigate = useNavigate()
 
@@ -19,6 +19,26 @@ const SectorItem = ({ item, onDeleteSuccess }) => {
 
     async function handleEdit(sectorId) {
         navigate(`/library/sector/edit?id=${sectorId}`)
+    }
+
+    if (onClick) {
+        return (
+            <li className={styles.clickable} onClick={onClick}>
+                <div className={styles.itemContainer}>
+                    <div className={styles.contentContainer}>
+                        <span className={styles.code}>ID: {item.code}</span>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Nome:</span>
+                            <span className={styles.name}>{item.name}</span>
+                        </div>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Descrição:</span>
+                            <span className={styles.name}>{item.description ? item.description : 'Não definido'}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        )
     }
 
     return (
