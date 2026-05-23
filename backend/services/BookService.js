@@ -4,6 +4,8 @@
     const Genre = require('../models/Book/Genre')
     const Book = require('../models/Book/Book')
     const BookCopy = require('../models/Book/BookCopy')
+    const Sector = require('../models/Library/Sector')
+    const Shelf = require('../models/Library/Shelf')
 
 // imports
     const LibraryService = require('./LibraryService')
@@ -984,7 +986,10 @@ module.exports = class BookService {
             return shelf
         }
 
+        const code = await Counter.nextSequence('bookcopy')
+
         const bookCopy = new BookCopy({
+            code,
             bookId: bookCopyData.bookId,
             sectorId: bookCopyData.sectorId,
             shelfId: bookCopyData.shelfId,
@@ -1011,12 +1016,72 @@ module.exports = class BookService {
         }
     }
 
-    async getAllBookCopies() {
+    async getAllBookCopies({ page = 1, search = '' } = {}) {
         try {
-            const bookCopies = await BookCopy.find()
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            let query = {}
+
+            if (search) {
+                const regex = { $regex: search, $options: 'i' }
+
+                const [authorMatches, publisherMatches, genreMatches, sectorMatches, shelfMatches] = await Promise.all([
+                    Author.find({ name: regex }, '_id'),
+                    Publisher.find({ name: regex }, '_id'),
+                    Genre.find({ name: regex }, '_id'),
+                    Sector.find({ name: regex }, '_id'),
+                    Shelf.find({ name: regex }, '_id'),
+                ])
+
+                const bookQuery = {
+                    $or: [
+                        { title: regex },
+                        { subtitle: regex },
+                        { language: regex },
+                        { isbn: regex },
+                        { edition: regex },
+                        { year: regex },
+                        { description: regex },
+                        { authorsId: { $in: authorMatches.map(a => a._id) } },
+                        { publisherId: { $in: publisherMatches.map(p => p._id) } },
+                        { genresId: { $in: genreMatches.map(g => g._id) } },
+                    ]
+                }
+                const bookMatches = await Book.find(bookQuery, '_id')
+
+                query.$or = [
+                    { code: regex },
+                    { copycode: regex },
+                    { status: regex },
+                    { condition: regex },
+                    { notes: regex },
+                    { bookId: { $in: bookMatches.map(b => b._id) } },
+                    { sectorId: { $in: sectorMatches.map(s => s._id) } },
+                    { shelfId: { $in: shelfMatches.map(s => s._id) } },
+                ]
+            }
+
+            const bookCopies = await BookCopy.find(query)
+                .populate({
+                    path: 'bookId',
+                    populate: [
+                        { path: 'authorsId', select: 'name' },
+                        { path: 'publisherId', select: 'name' },
+                        { path: 'genresId', select: 'name' },
+                    ]
+                })
+                .populate('sectorId', 'name')
+                .populate('shelfId', 'name')
+                .skip(skip)
+                .limit(limit)
+            const total = await BookCopy.countDocuments(query)
+
             return {
                 valid: true,
-                bookCopies
+                bookCopies,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
@@ -1032,9 +1097,20 @@ module.exports = class BookService {
         if (existingBookCopy && !existingBookCopy.valid) {
             return existingBookCopy
         }
+        const bookCopy = await BookCopy.findById(existingBookCopy.bookCopy._id)
+            .populate({
+                path: 'bookId',
+                populate: [
+                    { path: 'authorsId', select: 'name' },
+                    { path: 'publisherId', select: 'name' },
+                    { path: 'genresId', select: 'name' },
+                ]
+            })
+            .populate('sectorId', 'name code')
+            .populate('shelfId', 'name code')
         return {
             valid: true,
-            bookCopy: existingBookCopy.bookCopy
+            bookCopy
         }
     }
 

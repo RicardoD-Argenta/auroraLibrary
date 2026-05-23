@@ -5,6 +5,12 @@ const BookCopy = mongoose.model(
     'BookCopy',
     new Schema(
         {
+        code: {
+            type: String,
+            required: true,
+            unique: true,
+            maxlength: 20
+        },
         bookId: {
             type: Schema.Types.ObjectId,
             ref: 'Book',
@@ -22,7 +28,7 @@ const BookCopy = mongoose.model(
         },
         copycode: {
             type: String,
-            maxlength: 20,
+            maxlength: 6,
             required: true
         },
         status: {

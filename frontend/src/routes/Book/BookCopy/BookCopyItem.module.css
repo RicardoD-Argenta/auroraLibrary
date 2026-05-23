@@ -37,8 +37,16 @@
 .label {
     font-size: .8rem;
     font-weight: bold;
-    min-width: 5rem;
+    min-width: 5.5rem;
 }
+
+.labelVariant {
+    font-size: .8rem;
+    font-weight: bold;
+    min-width: 5.5rem;
+    max-width: 5.5rem;
+}
+
 
 .name {
     font-size: .9rem;
@@ -74,9 +82,45 @@
     border-bottom: none;
 }
 
-@media screen and (max-width: 690px) {
+.bookContainer {
+    border-bottom: 1px solid var(--text-color-disabled);
+    padding: .3rem 0 0.22rem 0.2rem;
+    background-color: var(--background-color-variant);
+}
+
+:global(li:nth-child(even)) .bookContainer {
+    background-color: var(--background-color-variant-2);
+}
+
+
+.bookDropdown {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    padding: .3rem 0 .3rem .8rem;
+    border-left: 2px solid var(--text-color-disabled);
+    margin-bottom: .2rem;
+}
+
+.chevron {
+    font-size: 1.2rem;
+
+    line-height: 1;
+    transition: transform 0.2s ease;
+    transform: rotate(90deg);
+    color: var(--text-color-variant);
+    flex-shrink: 0;
+    margin-right: .6rem;
+}
+
+.chevronOpen {
+    transform: rotate(270deg);
+}
+
+@media screen and (max-width: 720px) {
     .itemContainer {
-        padding: 0 1.5rem 0 0;
+        padding: 0 2rem 0 0;
     }
     
 }

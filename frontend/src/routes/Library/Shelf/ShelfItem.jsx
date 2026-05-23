@@ -8,7 +8,7 @@ import ListActions from '../../../components/lists/ListActions'
 import useShelf from '../../../hooks/useShelf'
 
 
-const ShelfItem = ({ item, onDeleteSuccess }) => {
+const ShelfItem = ({ item, onClick, onDeleteSuccess }) => {
     const { deleteShelf } = useShelf()
     const navigate = useNavigate()
 
@@ -19,6 +19,26 @@ const ShelfItem = ({ item, onDeleteSuccess }) => {
 
     async function handleEdit(shelfId) {
         navigate(`/library/shelf/edit?id=${shelfId}`)
+    }
+
+    if (onClick) {
+        return (
+            <li className={styles.clickable} onClick={onClick}>
+                <div className={styles.itemContainer}>
+                    <div className={styles.contentContainer}>
+                        <span className={styles.code}>ID: {item.code}</span>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Nome:</span>
+                            <span className={styles.name}>{item.name}</span>
+                        </div>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Descrição:</span>
+                            <span className={styles.name}>{item.description ? item.description : 'Não definido'}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        )
     }
 
     return (
