@@ -37,14 +37,14 @@
 .label {
     font-size: .8rem;
     font-weight: bold;
-    min-width: 5.5rem;
+    min-width: 6.5rem;
 }
 
 .labelVariant {
     font-size: .8rem;
     font-weight: bold;
-    min-width: 5.5rem;
-    max-width: 5.5rem;
+    min-width: 6.5rem;
+    max-width: 6.5rem;
 }
 
 
@@ -61,61 +61,6 @@
 
 .labelContainer:last-child {
     border-bottom: none;
-}
-
-/* Clickable Book */
-.clickableBook {
-    cursor: pointer;
-    width: 100%;
-}
-
-.clickableBook:hover {
-    background-color: var(--grey) !important;
-}
-
-
-.clickableBook .labelContainer {
-    border-bottom: 1px solid var(--text-color-disabled);
-}
-
-.clickableBook .labelContainer:last-child {
-    border-bottom: none;
-}
-
-.bookContainer {
-    border-bottom: 1px solid var(--text-color-disabled);
-    padding: .3rem 0 0.22rem 0.2rem;
-    background-color: var(--background-color-variant);
-}
-
-:global(li:nth-child(even)) .bookContainer {
-    background-color: var(--background-color-variant-2);
-}
-
-
-.bookDropdown {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: .3rem;
-    padding: .3rem 0 .3rem .8rem;
-    border-left: 2px solid var(--text-color-disabled);
-    margin-bottom: .2rem;
-}
-
-.chevron {
-    font-size: 1.2rem;
-
-    line-height: 1;
-    transition: transform 0.2s ease;
-    transform: rotate(90deg);
-    color: var(--text-color-variant);
-    flex-shrink: 0;
-    margin-right: .6rem;
-}
-
-.chevronOpen {
-    transform: rotate(270deg);
 }
 
 /* Clickable */

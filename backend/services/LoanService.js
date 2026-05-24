@@ -1,8 +1,14 @@
 // models
     const Loan = require('../models/Loan/Loans')
     const BookCopy = require('../models/Book/BookCopy')
+    const Book = require('../models/Book/Book')
+    const User = require('../models/User/User')
+    const Member = require('../models/Library/Member')
 
 // imports
+    const Counter = require('../models/Counter')
+
+// services
     const BookService = require('./BookService')
     const bookService = new BookService()
 
@@ -102,7 +108,10 @@ module.exports = class LoanService {
             return operator
         }
 
+        const code = await Counter.nextSequence('loan')
+
         const loan = new Loan({
+            code,
             copyId: loanData.copyId,
             memberId: loanData.memberId,
             operatorId: loanData.operatorId,
@@ -131,13 +140,63 @@ module.exports = class LoanService {
         }
     }
 
-    async allLoans() {
+    async allLoans({ page = 1, search = '', status = '', fromDate = '', toDate = '' } = {}) {
         try {
-            const loans = await Loan.find({ status: 'active' })
-                .sort({ createdAt: -1 })
+            const limit = 12
+            const skip = (page - 1) * limit
+
+            let query = {}
+
+            if (status) query.status = status
+
+            if (fromDate || toDate) {
+                query.loanDate = {}
+                if (fromDate) query.loanDate.$gte = new Date(fromDate)
+                if (toDate) query.loanDate.$lte = new Date(toDate + 'T23:59:59.999Z')
+            }
+
+            if (search) {
+                const regex = { $regex: search, $options: 'i' }
+
+                const [bookMatches, userMatches, memberMatches] = await Promise.all([
+                    Book.find({ title: regex }, '_id'),
+                    User.find({ name: regex }, '_id'),
+                    Member.find({ name: regex }, '_id')
+                ])
+
+                const copyMatches = await BookCopy.find({ bookId: { $in: bookMatches.map(b => b._id) } }, '_id')
+                const userIds = userMatches.map(u => u._id)
+                const memberIds = memberMatches.map(m => m._id)
+
+                const orConditions = [
+                    { notes: regex },
+                    { copyId: { $in: copyMatches.map(c => c._id) } },
+                    { memberId: { $in: memberIds } },
+                    { operatorId: { $in: userIds } },
+                ]
+
+                const codeNumber = parseInt(search)
+                if (!isNaN(codeNumber)) orConditions.push({ code: codeNumber })
+
+                query.$or = orConditions
+            }
+
+            const [loans, total] = await Promise.all([
+                Loan.find(query)
+                    .populate({ path: 'copyId', populate: { path: 'bookId', select: 'title' } })
+                    .populate('memberId', 'name email phone student member')
+                    .populate('operatorId', 'name')
+                    .sort({ createdAt: -1 })
+                    .skip(skip)
+                    .limit(limit),
+                Loan.countDocuments(query)
+            ])
+
             return {
                 valid: true,
-                loans
+                loans,
+                total,
+                pages: Math.ceil(total / limit)
             }
         } catch (error) {
             return {
@@ -149,13 +208,25 @@ module.exports = class LoanService {
     }
 
     async loanById(loanData) {
-        const existingLoan = await this.existingLoan(loanData)
-        if (!existingLoan.valid) {
-            return existingLoan
-        }
-        return {
-            valid: true,
-            loan: existingLoan.loan
+        try {
+            const loan = await Loan.findById(loanData.id)
+                .populate({ path: 'copyId', populate: { path: 'bookId', select: 'title' } })
+                .populate('memberId', 'name email phone student member')
+                .populate('operatorId', 'name')
+            if (!loan) {
+                return {
+                    valid: false,
+                    message: 'Empréstimo não cadastrado',
+                    err: 'loan-not-registered'
+                }
+            }
+            return { valid: true, loan }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar empréstimo',
+                err: error.message
+            }
         }
     }
 
@@ -176,7 +247,7 @@ module.exports = class LoanService {
 
         const loanDate = new Date(existingLoan.loan.loanDate)
         const dueDate = new Date(loanData.dueDate)
-        const returnDate = new Date(loanData.returnDate)
+        const returnDate = loanData.returnDate ? new Date(loanData.returnDate) : null
 
         if (loanDate.getTime() > dueDate.getTime()) {
             return {
@@ -186,7 +257,7 @@ module.exports = class LoanService {
             }
         }
 
-        if (loanDate.getTime() > returnDate.getTime()) {
+        if (returnDate && loanDate.getTime() > returnDate.getTime()) {
             return {
                 valid: false,
                 message: 'Data de devolução deve ser maior que a data de empréstimo',
@@ -218,6 +289,7 @@ module.exports = class LoanService {
 
             if (loanData.status === 'returned') {
                 await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'available' })
+                await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { condition: loanData.conditionIn })
             }
             else if (loanData.status === 'overdue' || loanData.status === 'active') {
                 await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'borrowed' })
@@ -225,8 +297,6 @@ module.exports = class LoanService {
             else if (loanData.status === 'lost') {
                 await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { status: 'lost' })
             }
-
-            await BookCopy.findByIdAndUpdate(existingLoan.loan.copyId, { condition: loanData.conditionIn })
 
             return {
                 valid: true,

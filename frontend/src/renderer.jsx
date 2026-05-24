@@ -13,6 +13,13 @@ import Login from './routes/Auth/Login.jsx'
   import ListUsers from './routes/Auth/User/ListUsers.jsx'
   import EditUser from './routes/Auth/User/EditUser.jsx'
 
+// Loan
+   
+  // Loan
+  import CreateLoan from './routes/Loan/Loan/CreateLoan.jsx'
+  import ListLoan from './routes/Loan/Loan/ListLoan.jsx'
+  import EditLoan from './routes/Loan/Loan/EditLoan.jsx'
+
 // Book
 
   // BookCopy
@@ -86,6 +93,19 @@ const router = createBrowserRouter([
           {
             path: '/',
             element: <Home />
+          },
+          // Loan
+          {
+            path: '/loan/register',
+            element: <CreateLoan />
+          },
+          {
+            path: '/loan/list',
+            element: <ListLoan />
+          },
+          {
+            path: '/loan/edit',
+            element: <EditLoan />
           },
           // BookCopy
           {

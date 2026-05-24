@@ -113,7 +113,13 @@ module.exports = class LoanController {
     }
 
     static async allLoans(req, res) {
-        const loans = await loanService.allLoans()
+        const page = parseInt(req.query.page) || 1
+        const search = req.query.search || ''
+        const status = req.query.status || ''
+        const fromDate = req.query.fromDate || ''
+        const toDate = req.query.toDate || ''
+
+        const loans = await loanService.allLoans({ page, search, status, fromDate, toDate })
         if (!loans.valid) {
             return res.status(400).json({
                 message: loans.message,
@@ -121,8 +127,9 @@ module.exports = class LoanController {
             })
         } else {
             return res.status(200).json({
-                message: loans.message,
-                loans: loans.loans
+                loans: loans.loans,
+                total: loans.total,
+                pages: loans.pages
             })
         }
     }
@@ -172,14 +179,14 @@ module.exports = class LoanController {
             })
         }
 
-        const { notes, dueDate, conditionIn, status } = req.body
+        const { notes, dueDate, status } = req.body
         let returnDate = req.body.returnDate
+        let conditionIn = req.body.conditionIn
 
         const fieldsConfig = {
-            required: ['dueDate', 'conditionIn', 'status'],
+            required: ['dueDate', 'status'],
             labels: {
                 dueDate: 'Data de vencimento',
-                conditionIn: 'Condição final do exemplar',
                 status: 'Status do empréstimo'
             }
         }
@@ -188,6 +195,8 @@ module.exports = class LoanController {
         if (status === 'returned') {
             fieldsConfig.required.push('returnDate')
             fieldsConfig.labels.returnDate = 'Data de devolução'
+            fieldsConfig.required.push('conditionIn')
+            fieldsConfig.labels.conditionIn = 'Condição do exemplar na devolução'
         }
 
         const reqFields = emptyFields(fieldsConfig)
@@ -220,11 +229,19 @@ module.exports = class LoanController {
 
         if (status !== 'returned') {
             returnDate = null
+            conditionIn = null
         }
 
         if (status === 'returned') {
             datesConfig.dates.push('returnDate')
             datesConfig.labels.returnDate = 'Data de devolução'
+
+            if (!['new', 'good', 'worn', 'damaged'].includes(conditionIn)) {
+                return res.status(400).json({
+                    message: 'Condição inválida',
+                    err: 'invalid-condition'
+                })
+            }
         }
         
         const dates = isDate(datesConfig)
@@ -240,13 +257,6 @@ module.exports = class LoanController {
             return res.status(400).json({
                 message: 'Status inválido',
                 err: 'invalid-status'
-            })
-        }
-
-        if (!['new', 'good', 'worn', 'damaged'].includes(conditionIn)) {
-            return res.status(400).json({
-                message: 'Condição inválida',
-                err: 'invalid-condition'
             })
         }
     
