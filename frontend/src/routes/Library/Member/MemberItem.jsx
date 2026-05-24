@@ -3,21 +3,10 @@ import styles from './MemberItem.module.css'
 
 // imports
 import ListActions from '../../../components/lists/ListActions'
-import { GRADES } from '../../../components/form/ClassSelect'
+import { decodeClass } from '../../../utils/decodeClass'
 
 // hooks
 import useMember from '../../../hooks/useMember'
-
-function decodeClass(val) {
-    if (!val) return ''
-    const lastChar = val.slice(-1)
-    const hasLetter = /[A-Z]/.test(lastChar)
-    const grade = hasLetter ? val.slice(0, -1) : val
-    const letter = hasLetter ? lastChar : ''
-    const gradeEntry = GRADES.find(g => g.value === grade)
-    if (!gradeEntry) return val
-    return letter ? `${gradeEntry.label} - ${letter}` : gradeEntry.label
-}
 
 function formatDate(val) {
     if (!val) return ''
@@ -25,7 +14,7 @@ function formatDate(val) {
 }
 
 
-const MemberItem = ({ item, onDeleteSuccess }) => {
+const MemberItem = ({ item, onClick, onDeleteSuccess }) => {
     const { deleteMember } = useMember()
     const navigate = useNavigate()
 
@@ -36,6 +25,46 @@ const MemberItem = ({ item, onDeleteSuccess }) => {
 
     async function handleEdit(memberId) {
         navigate(`/library/member/edit?id=${memberId}`)
+    }
+
+    if (onClick) {
+        return (
+            <li className={styles.clickable} onClick={onClick}>
+                <div className={styles.itemContainer}>
+                    <div className={styles.contentContainer}>
+                        <span className={styles.code}>ID: {item.code}</span>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Nome:</span>
+                            <span className={styles.name}>{item.name}</span>
+                        </div>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Email:</span>
+                            <span className={styles.name}>{item.email ? item.email : 'Não definido'}</span>
+                        </div>
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Telefone:</span>
+                            <span className={styles.name}>{item.phone ? item.phone : 'Não definido'}</span>
+                        </div>
+                        {item.student.isStudent && (
+                            <div className={styles.labelContainer}>
+                                <span className={styles.label}>Classe:</span>
+                                <span className={styles.name}>{decodeClass(item.student.studentClass)}</span>
+                            </div>
+                        )}
+                        {item.member.isMember && (
+                            <div className={styles.labelContainer}>
+                                <span className={styles.label}>Data de entrada:</span>
+                                <span className={styles.name}>{formatDate(item.member.memberSince)}</span>
+                            </div>
+                        )}
+                        <div className={styles.labelContainer}>
+                            <span className={styles.label}>Observações:</span>
+                            <span className={styles.name}>{item.observations ? item.observations : 'Não definido'}</span>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        )
     }
 
     return (

@@ -953,8 +953,10 @@ module.exports = class BookController {
     static async getAllBookCopies(req, res) {
         const page = parseInt(req.query.page) || 1
         const search = req.query.search || ''
+        const status = req.query.status || ''
+        const condition = req.query.condition || ''
 
-        const result = await bookService.getAllBookCopies({ page, search })
+        const result = await bookService.getAllBookCopies({ page, search, status, condition })
         if (!result.valid) {
             return res.status(400).json({
                 message: result.message,

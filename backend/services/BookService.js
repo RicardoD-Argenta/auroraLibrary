@@ -6,6 +6,7 @@
     const BookCopy = require('../models/Book/BookCopy')
     const Sector = require('../models/Library/Sector')
     const Shelf = require('../models/Library/Shelf')
+    const Loan = require('../models/Loan/Loans')
 
 // imports
     const LibraryService = require('./LibraryService')
@@ -959,6 +960,34 @@ module.exports = class BookService {
         }
     }
 
+    async checkIfLoanIsActive(bookCopyData) {
+        try {
+            const activeLoan = await Loan.findOne({
+                copyId: bookCopyData.id,
+                status: { $in: ['active', 'overdue'] }
+            })
+            if (activeLoan) {
+                return {
+                    valid: false,
+                    message: 'Já existe um empréstimo ativo para este exemplar',
+                    err: 'loan-already-active'
+                }
+            }
+            else {
+                return {
+                    valid: true,
+                    loan: activeLoan
+                }
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao verificar exemplar',
+                err: error.message
+            }
+        }
+    }
+
     async registerBookCopy(bookCopyData) {
         const registeredBookCopy = await this.registeredBookCopy(bookCopyData)
         if (registeredBookCopy && !registeredBookCopy.valid) {
@@ -1016,12 +1045,15 @@ module.exports = class BookService {
         }
     }
 
-    async getAllBookCopies({ page = 1, search = '' } = {}) {
+    async getAllBookCopies({ page = 1, search = '', status = '', condition = '' } = {}) {
         try {
             const limit = 12
             const skip = (page - 1) * limit
 
             let query = {}
+
+            if (status) query.status = status
+            if (condition) query.condition = condition
 
             if (search) {
                 const regex = { $regex: search, $options: 'i' }
@@ -1144,6 +1176,11 @@ module.exports = class BookService {
         })
         if (shelf && !shelf.valid) {
             return shelf
+        }
+
+        const loan = await this.checkIfLoanIsActive(bookCopyData)
+        if (loan && !loan.valid) {
+            return loan
         }
 
         const bookCopy = existingBookCopy.bookCopy

@@ -9,8 +9,8 @@ export const sidebarData = [
     label: 'Empréstimos',
     icon: FaExchangeAlt,
     children: [
-      { label: 'Novo', path: '/loans/new' },
-      { label: 'Listar', path: '/loans' },
+      { label: 'Novo', path: '/loan/register' },
+      { label: 'Listar', path: '/loan/list' },
     ]
   },
   {

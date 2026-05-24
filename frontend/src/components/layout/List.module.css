@@ -3,6 +3,24 @@
     margin: 2rem auto 0;
 }
 
+.multiple {
+    display: flex;
+}
+
+.searchBar {
+    width: 100%;
+}
+
+.statusFilter,
+.dateContainer {
+    width: 16rem;
+}
+
+.dateContainer {
+    margin: 0 auto;
+    gap: 1rem;
+}
+
 .listContainer {
     width: 90%;
     margin: 1rem auto;

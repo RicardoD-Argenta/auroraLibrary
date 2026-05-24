@@ -5,14 +5,20 @@ const Loans = mongoose.model(
     'Loans',
     new Schema(
         {
+        code: {
+            type: String,
+            required: true,
+            unique: true,
+            maxlength: 20
+        },
         copyId: {
             type: Schema.Types.ObjectId,
-            ref: 'Book',
+            ref: 'BookCopy',
             required: true
         },
         memberId: {
             type: Schema.Types.ObjectId,
-            ref: 'User',
+            ref: 'Member',
             required: true
         },
         operatorId: {

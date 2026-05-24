@@ -19,11 +19,11 @@ export default function useBookCopy() {
         }
     }
 
-    async function getBookCopies(page = 1, search = '') {
+    async function getBookCopies(page = 1, search = '', status = '', condition = '') {
         try {
             setLoading(true)
             const res = await api.get('/book/bookcopy/all', {
-                params: { page, search }
+                params: { page, search, ...(status && { status }), ...(condition && { condition }) }
             })
             return res.data
         } catch (err) {
