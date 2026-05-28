@@ -37,7 +37,7 @@ const ListLoan = () => {
   return (
     <div>
         <div className="header">
-          <h2>Exemplares</h2>
+          <h2>Empréstimos</h2>
         </div>
         <section>
           <div className={`${styles.searchContainer} ${styles.multiple}`}>

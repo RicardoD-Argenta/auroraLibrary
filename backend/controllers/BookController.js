@@ -769,6 +769,14 @@ module.exports = class BookController {
         const okIds = objectIdValidation(req, res)
         if (!okIds) return
 
+        // verifica se authorsId e genresId não são arrays vazios
+        if (!Array.isArray(authorsId) || authorsId.length === 0) {
+            return res.status(400).json({ message: 'Informe ao menos um autor', err: 'empty-authors' })
+        }
+        if (!Array.isArray(genresId) || genresId.length === 0) {
+            return res.status(400).json({ message: 'Informe ao menos um gênero', err: 'empty-genres' })
+        }
+
         // verifica se o ano é válido
         const resultYear = validateYear(year)
         if (!resultYear.valid) {

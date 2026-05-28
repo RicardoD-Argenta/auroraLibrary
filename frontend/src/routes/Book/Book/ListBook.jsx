@@ -33,7 +33,7 @@ const ListBook = () => {
   return (
     <div>
         <div className="header">
-          <h2>Books</h2>
+          <h2>Livros</h2>
         </div>
         <section>
           <div className={styles.searchContainer}>

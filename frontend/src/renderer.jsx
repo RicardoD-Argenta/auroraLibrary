@@ -20,6 +20,9 @@ import Login from './routes/Auth/Login.jsx'
   import ListLoan from './routes/Loan/Loan/ListLoan.jsx'
   import EditLoan from './routes/Loan/Loan/EditLoan.jsx'
 
+  // LoanDelay
+  import EditLoanDelay from './routes/Loan/LoanDelay/EditLoanDelay.jsx'
+
 // Book
 
   // BookCopy
@@ -106,6 +109,11 @@ const router = createBrowserRouter([
           {
             path: '/loan/edit',
             element: <EditLoan />
+          },
+          // LoanDelay
+          {
+            path: '/loan/delay/edit',
+            element: <EditLoanDelay />
           },
           // BookCopy
           {

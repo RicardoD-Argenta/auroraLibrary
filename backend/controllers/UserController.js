@@ -211,7 +211,7 @@ module.exports = class UserController {
         const userId = req.authenticatedUserId
         const userRole = req.authenticatedUserRole
 
-        const { name, login, password, oldPassword } = req.body
+        const { name, login, password, oldPassword, role } = req.body
 
         const fieldsConfig = {
             required: ['name', 'login'],
@@ -239,6 +239,21 @@ module.exports = class UserController {
             }
 
         }
+
+        if (role) {
+            if (!['admin', 'librarian'].includes(role)) {
+                return res.status(400).json({
+                    message: 'Cargo inválido',
+                    err: 'invalid-role'
+                })
+            }
+            if (userRole !== 'admin') {
+                return res.status(400).json({
+                    message: 'Acesso negado',
+                    err: 'access-denied'
+                })
+            }
+        }
         
         let reqFields = emptyFields(fieldsConfig)
         let fieldsValidation = reqFields(req)
@@ -249,14 +264,13 @@ module.exports = class UserController {
             })
         }
 
-        
-
         const result = await userService.updateUser({
             id,
             name,
             login,
             password,
             oldPassword,
+            role,
             userId,
             userRole
         })

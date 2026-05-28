@@ -4,6 +4,7 @@
     const Shelf = require('../models/Library/Shelf')
     const Library = require('../models/Library/Library')
     const LibraryParams = require('../models/Library/LibraryParams')
+    const BookCopy = require('../models/Book/BookCopy')
 
 // helpers
     const Counter = require('../models/Counter')
@@ -371,6 +372,15 @@ module.exports = class LibraryService {
             return existingSector
         }
 
+        const existingBooks = await BookCopy.find({ sectorId: existingSector.sector._id })
+        if (existingBooks.length > 0) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir o setor pois existem exemplares cadastrados',
+                err: 'sector-has-copies'
+            }
+        }
+
         try {
             await Sector.findByIdAndDelete(sectorData.id)
             return {
@@ -547,6 +557,15 @@ module.exports = class LibraryService {
         const existingShelf = await this.existingShelf(shelfData)
         if (existingShelf && !existingShelf.valid) {
             return existingShelf
+        }
+
+        const existingBooks = await BookCopy.find({ shelfId: existingShelf.shelf._id })
+        if (existingBooks.length > 0) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir a prateleira pois existem exemplares cadastrados',
+                err: 'shelf-has-copies'
+            }
         }
 
         try {

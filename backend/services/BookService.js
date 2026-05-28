@@ -186,6 +186,15 @@ module.exports = class BookService {
             return existingPublisher
         }
 
+        const bookWithPublisher = await Book.findOne({ publisherId: existingPublisher.publisher._id })
+        if (bookWithPublisher) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir a editora pois existem livros cadastrados',
+                err: 'publisher-has-books'
+            }
+        }
+
         try {
             await Publisher.findByIdAndDelete(existingPublisher.publisher._id)
             return {
@@ -357,6 +366,15 @@ module.exports = class BookService {
         const existingAuthor = await this.existingAuthor(authorData)
         if (existingAuthor && !existingAuthor.valid) {
             return existingAuthor
+        }
+
+        const existingBooks = await Book.find({ authorsId: existingAuthor.author._id })
+        if (existingBooks.length > 0) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir o autor pois existem livros cadastrados',
+                err: 'author-has-books'
+            }
         }
 
         try {
@@ -605,6 +623,15 @@ module.exports = class BookService {
             return {
                 valid: false,
                 message: 'Não é possível excluir um gênero com filhos'
+            }
+        }
+
+        const existingBooks = await Book.find({ genresId: existingGenre.genre._id })
+        if (existingBooks.length > 0) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir o gênero pois existem livros cadastrados',
+                err: 'genre-has-books'
             }
         }
 
@@ -889,6 +916,15 @@ module.exports = class BookService {
             return existingBook
         }
 
+        const existingBookCopies = await BookCopy.find({ bookId: existingBook.book._id })
+        if (existingBookCopies.length > 0) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir o livro pois existem exemplares cadastrados',
+                err: 'book-has-copies'
+            }
+        }
+
         try {
             await Book.findByIdAndDelete(existingBook.book._id)
             return {
@@ -964,7 +1000,7 @@ module.exports = class BookService {
         try {
             const activeLoan = await Loan.findOne({
                 copyId: bookCopyData.id,
-                status: { $in: ['active', 'overdue'] }
+                status: { $in: ['active', 'overdue', 'lost'] },
             })
             if (activeLoan) {
                 return {
@@ -1215,6 +1251,11 @@ module.exports = class BookService {
         const existingBookCopy = await this.existingBookCopy(bookCopyData)
         if (existingBookCopy && !existingBookCopy.valid) {
             return existingBookCopy
+        }
+
+        const loan = await this.checkIfLoanIsActive(bookCopyData)
+        if (loan && !loan.valid) {
+            return loan
         }
 
         try {

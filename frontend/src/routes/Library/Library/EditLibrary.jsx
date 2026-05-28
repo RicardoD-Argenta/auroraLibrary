@@ -92,8 +92,8 @@ const EditLibrary = () => {
                     value={library.params.loanDelay}
                     onChange={(val) => handleParamChange('loanDelay', val)}
                     fields={[
-                        { name: 'dailyRate', label: 'Taxa diária (%)', number: true },
-                        { name: 'fineValue', label: 'Multa base (R$)', number: true },
+                        { name: 'dailyRate', label: 'Taxa diária (%)', number: true, limit: 3 },
+                        { name: 'fineValue', label: 'Multa base (R$)', number: true, limit: 10 },
                     ]}
                 />
             </form>

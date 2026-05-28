@@ -13,4 +13,8 @@ router.get('/:id', verifyToken({ role: ['admin', 'librarian'] }), LoanController
 router.patch('/:id', verifyToken({ role: ['admin', 'librarian'] }), LoanController.updateLoan)
 router.delete('/:id', verifyToken({ role: ['admin', 'librarian'] }), LoanController.deleteLoan)
 
+// LoanDelay
+router.get('/delay/:id', verifyToken({ role: ['admin', 'librarian'] }), LoanController.getLoanDelayById)
+router.patch('/delay/:id', verifyToken({ role: ['admin', 'librarian'] }), LoanController.updateLoanDelay)
+
 module.exports = router

@@ -33,7 +33,7 @@ const ListMember = () => {
   return (
     <div>
         <div className="header">
-          <h2>Members</h2>
+          <h2>Membros</h2>
         </div>
         <section>
           <div className={styles.searchContainer}>

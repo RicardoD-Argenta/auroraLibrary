@@ -197,6 +197,18 @@ module.exports = class UserService {
 
         const user = await User.findById(userData.id)
 
+        if (userData.role) {
+            if (user.id === userData.userId) {
+                if (userData.role !== user.role) {
+                    return {
+                        valid: false,
+                        message: 'Você não pode alterar seu próprio cargo',
+                        err: 'update-self-role-not-valid'
+                    }
+                }
+            }
+        }
+
         const registeredUser = await this.registeredUser(userData)
         if (registeredUser && !registeredUser.valid) {
             return registeredUser
@@ -218,6 +230,10 @@ module.exports = class UserService {
             login: userData.login,
             password: newPassword,
         })
+
+        if (userData.role) {
+            user.set({ role: userData.role })
+        }
 
         try {
             const updatedUser = await user.save()

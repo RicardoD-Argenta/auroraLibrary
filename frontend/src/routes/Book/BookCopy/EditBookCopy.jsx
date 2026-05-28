@@ -152,7 +152,7 @@ const EditBookCopy = () => {
                             />
                         </div>
                         <div className={styles['input-wrapper']}>
-                            <Input text="Código Interno *" type="text" name="copycode" placeholder="" limit={20} value={bookCopy.copycode} handleOnChange={handleChange} number />
+                            <Input text="Código Interno *" type="text" name="copycode" placeholder="" limit={6} value={bookCopy.copycode} handleOnChange={handleChange} number />
                         </div>
                         <div className={styles['input-wrapper']}>
                             <EnumSelect
@@ -187,7 +187,7 @@ const EditBookCopy = () => {
                             <Input text="Data da aquisição *" type="date" name="acquireAt" value={bookCopy.acquireAt} handleOnChange={handleChange} />
                         </div>
                         <div className={styles['input-wrapper']}>
-                            <Input text="Notas " type="textarea" name="notes" placeholder="" limit={500} value={bookCopy.notes} handleOnChange={handleChange} />
+                            <Input text="Notas " type="textarea" name="notes" placeholder="" limit={300} value={bookCopy.notes} handleOnChange={handleChange} />
                         </div>
                     </div>
                 </form>
