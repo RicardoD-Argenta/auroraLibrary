@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './LoanItem.module.css'
+import { TbAlertSquare } from "react-icons/tb";
 
 // imports
 import ListActions from '../../../components/lists/ListActions'
@@ -27,6 +28,11 @@ const LoanItem = ({ item, onClick, onDeleteSuccess }) => {
         navigate(`/loan/edit?id=${loanId}`)
     }
 
+    async function handleDelay(e) {
+        e.preventDefault()
+        navigate(`/loan/delay/edit?id=${item.delayId}`)
+    }
+
     const STATUS_LABEL = { active: 'Ativo', returned: 'Devolvido', overdue: 'Atrasado', lost: 'Perdido' }
     const CONDITION_LABEL = { new: 'Novo', good: 'Bom', worn: 'Desgastado', damaged: 'Danificado' }
 
@@ -39,7 +45,7 @@ const LoanItem = ({ item, onClick, onDeleteSuccess }) => {
                     <span className={styles.code}>ID: {item.code}</span>
                     <div className={styles.labelContainer}>
                         <span className={styles.label}>Status:</span>
-                        <span className={styles.name}>{status}</span>
+                        <span className={styles[item.status]}>{status}</span>
                     </div>
                     <div className={styles.labelContainer}>
                         <span className={styles.label}>Exemplar:</span>
@@ -84,6 +90,11 @@ const LoanItem = ({ item, onClick, onDeleteSuccess }) => {
                 </div>
                 <div className={styles.actionsContainer}>
                     <ListActions onDelete={() => handleDelete(item._id) } onEdit={() => handleEdit(item._id)} />
+                    <div className={styles.delayButtonContainer}>
+                        {item.delayId ? (
+                            <button onClick={handleDelay}><span>Ver Multa</span><TbAlertSquare /></button>
+                        ) : null}
+                    </div>
                 </div>
             </div>
         </li>

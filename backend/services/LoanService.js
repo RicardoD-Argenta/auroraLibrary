@@ -4,6 +4,8 @@
     const Book = require('../models/Book/Book')
     const User = require('../models/User/User')
     const Member = require('../models/Library/Member')
+    const LoanDelay = require('../models/loan/LoanDelay')
+    const LibraryParams = require('../models/Library/LibraryParams')
 
 // imports
     const Counter = require('../models/Counter')
@@ -20,6 +22,8 @@
 
 
 module.exports = class LoanService {
+    // ------------------------ criação de empréstimos ------------------------ //
+
     async registeredLoan(loanData) {
         const loan = await Loan.findOne({
             copyId: loanData.copyId,
@@ -192,9 +196,19 @@ module.exports = class LoanService {
                 Loan.countDocuments(query)
             ])
 
+            const pendingDelays = await LoanDelay.find({ loanId: { $in: loans.map(l => l._id) }, paid: false }, 'loanId')
+            const delayMap = {}
+            pendingDelays.forEach(d => { delayMap[d.loanId.toString()] = d._id })
+
+            const loansWithDelay = loans.map(loan => {
+                const obj = loan.toObject()
+                obj.delayId = delayMap[loan._id.toString()] || null
+                return obj
+            })
+
             return {
                 valid: true,
-                loans,
+                loans: loansWithDelay,
                 total,
                 pages: Math.ceil(total / limit)
             }
@@ -242,6 +256,18 @@ module.exports = class LoanService {
                 valid: false,
                 message: 'Este empréstimo já foi devolvido',
                 err: 'loan-already-returned'
+            }
+        }
+
+        const delay = await LoanDelay.find({
+            loanId: loanData.id,
+            paid: false
+        })
+        if (delay && delay.length > 0) {
+            return {
+                valid: false,
+                message: 'Existe uma multa não paga para este empréstimo',
+                err: 'loan-delay-exists'
             }
         }
 
@@ -318,6 +344,17 @@ module.exports = class LoanService {
             return existingLoan
         }
 
+        const delay = await LoanDelay.find({
+            loanId: loanData.id,
+        })
+        if (delay && delay.length > 0) {
+            return {
+                valid: false,
+                message: 'Existe uma multa para este empréstimo',
+                err: 'loan-delay-exists'
+            }
+        }
+
         try {
             const activeLoan = await Loan.findOne({
                 copyId: existingLoan.loan.copyId,
@@ -344,4 +381,235 @@ module.exports = class LoanService {
         }
     }
 
+    // ------------------------ empréstimos vencidos ------------------------ //
+    async verifyOverdueLoans() {
+        let loans = []
+
+        let overdueLoans = []
+
+        let delays = []
+
+        // verifica se há empréstimos vencidos
+        try {
+            const today = new Date()
+            today.setHours(0, 0, 0, 0)
+
+            // verifica os empréstimos ativos com data de vencimento menor que a data atual
+            loans = await Loan.find({ status: 'active', dueDate: { $lt: today } })
+
+            // verifica os empréstimos vencidos com data de vencimento menor que a data atual
+            overdueLoans = await Loan.find({ status: 'overdue', dueDate: { $lt: today } })
+
+            // verifica as multas não pagas
+            delays = await LoanDelay.find({ paid: false })
+
+            // retorna mensagem de sucesso se não houver nenhum empréstimo vencido ou multa não paga
+            if (loans.length === 0 && delays.length === 0 && overdueLoans.length === 0) {
+                return { valid: true, message: 'Nenhum empréstimo vencido para verificar!' }
+            }
+        } catch (error) {
+            return { valid: false, message: 'Erro ao verificar empréstimos vencidos!', err: error }
+        }
+
+
+        // atualiza os dias e taxa das multas não pagas além de atualizar os status dos empréstimos vencidos no bookCopy e no loan
+        try {
+            // puxa os parâmetros uma única vez antes dos loops
+            const schoolParams = await LibraryParams.findOne()
+
+            for (const loan of loans) {
+                // atualiza o status do empréstimo para vencido no bookCopy e no loan
+                await BookCopy.findByIdAndUpdate(loan.copyId, { status: 'overdue' })
+                await Loan.findByIdAndUpdate(loan._id, { status: 'overdue' })
+                const delay = await LoanDelay.findOne({ loanId: loan._id })
+
+                if (delay) {
+                    continue
+                }
+
+
+                // verifica se o parametro de atraso está ativo
+                if (schoolParams.params.loanDelay.active) {
+
+                    // calcula quantos dias foram atrasados
+                    let daysLate = Math.floor((new Date().getTime() - loan.dueDate.getTime()) / (1000 * 60 * 60 * 24))
+
+                    const code = await Counter.nextSequence('loandelay')
+
+                    // calcula a multa
+                    let fineValue = schoolParams.params.loanDelay.fineValue
+                    let dailyRate = schoolParams.params.loanDelay.dailyRate
+                    // fórmula de cálculo da multa: valor da multa + (dias de atraso * (taxa diária / 100) * valor da multa) 
+                    let overdueFeeFormula = Math.ceil(fineValue + ((daysLate * (dailyRate / 100)) * fineValue))
+
+                    // cria objeto de multa
+                    const loanDelay = {
+                        code,
+                        loanId: loan._id,
+                        overdueDays: daysLate,
+                        overdueFee: overdueFeeFormula,
+                        paid: false,
+                        paidAt: null
+                    }
+                    try {
+                        await LoanDelay.create(loanDelay)
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+            }
+
+            for (const loan of overdueLoans) {
+                // atualiza o status do empréstimo para vencido no bookCopy e no loan
+                await BookCopy.findByIdAndUpdate(loan.copyId, { status: 'overdue' })
+                const delay = await LoanDelay.findOne({ loanId: loan._id })
+
+                if (delay) {
+                    continue
+                }
+
+                // verifica se o parametro de atraso está ativo
+                if (schoolParams.params.loanDelay.active) {
+
+                    // calcula quantos dias foram atrasados
+                    let daysLate = Math.floor((new Date().getTime() - loan.dueDate.getTime()) / (1000 * 60 * 60 * 24))
+
+                    const code = await Counter.nextSequence('loandelay')
+
+                    // calcula a multa
+                    let fineValue = schoolParams.params.loanDelay.fineValue
+                    let dailyRate = schoolParams.params.loanDelay.dailyRate
+                    // fórmula de cálculo da multa: valor da multa + (dias de atraso * (taxa diária / 100) * valor da multa) 
+                    let overdueFeeFormula = Math.ceil(fineValue + ((daysLate * (dailyRate / 100)) * fineValue))
+
+                    // cria objeto de multa
+                    const loanDelay = {
+                        code,
+                        loanId: loan._id,
+                        overdueDays: daysLate,
+                        overdueFee: overdueFeeFormula,
+                        paid: false,
+                        paidAt: null
+                    }
+                    try {
+                        await LoanDelay.create(loanDelay)
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+            }
+
+            for (const delay of delays) {
+                const loanId = await Loan.findById(delay.loanId)
+
+                // verifica se o parametro de atraso está ativo
+                if (schoolParams.params.loanDelay.active) {
+                    // calcula quantos dias foram atrasados
+                    let daysLate = Math.floor((new Date().getTime() - loanId.dueDate.getTime()) / (1000 * 60 * 60 * 24))
+                    // calcula a multa
+                    let fineValue = schoolParams.params.loanDelay.fineValue
+                    let dailyRate = schoolParams.params.loanDelay.dailyRate
+                    // fórmula de cálculo da multa: valor da multa + (dias de atraso * (taxa diária / 100) * valor da multa) 
+                    let overdueFee = Math.ceil(fineValue + ((daysLate * (dailyRate / 100)) * fineValue))
+
+                    try {
+                        // atualiza a multa e os dias atrasados
+                        await LoanDelay.findByIdAndUpdate(delay._id, { overdueDays: daysLate, overdueFee: overdueFee })
+                    } catch (error) {
+                        console.log(error)
+                    }
+                }
+            }
+
+            return { valid: true, message: 'Empréstimos vencidos atualizados com sucesso!' }
+        } catch (error) {
+            return { valid: false, message: 'Erro ao atualizar empréstimos vencidos!', err: error }
+        }
+    }
+
+    async existingLoanDelay(loanDelayData) {
+        try {
+            const loanDelay = await LoanDelay.findOne({
+                _id: loanDelayData.id
+            })
+            .populate('loanId', 'code dueDate' )
+            if (!loanDelay) {
+                return {
+                    valid: false,
+                    message: 'Multa não cadastrada',
+                    err: 'loan-delay-not-registered'
+                }
+            }
+            return {
+                valid: true,
+                loanDelay
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao buscar multa',
+                err: error.message
+            }
+        }
+    }
+
+    async getLoanDelayById(loanDelayData) {
+        const existingLoanDelay = await this.existingLoanDelay(loanDelayData)
+        if (existingLoanDelay && !existingLoanDelay.valid) {
+            return existingLoanDelay
+        }
+        return {
+            valid: true,
+            loanDelay: existingLoanDelay.loanDelay
+        }
+    }
+
+    async updateLoanDelay(loanDelayData) {
+        const existingLoanDelay = await this.existingLoanDelay(loanDelayData)
+        if (existingLoanDelay && !existingLoanDelay.valid) {
+            return existingLoanDelay
+        }
+
+        if (existingLoanDelay.loanDelay.paid) {
+            return {
+                valid: false,
+                message: 'Esta multa já foi paga',
+                err: 'loan-delay-already-paid'
+            }
+        }
+
+        if (loanDelayData.paid === true || loanDelayData.paid === 'true') {
+            if (new Date(loanDelayData.paidAt).getTime() < existingLoanDelay.loanDelay.loanId.dueDate.getTime()) {
+                return {
+                    valid: false,
+                    message: 'Data de pagamento deve ser maior que a data de vencimento da multa',
+                    err: 'invalid-paid-at'
+                }
+            }
+        }
+
+        const loanDelay = existingLoanDelay.loanDelay
+            loanDelay.set({
+                paid: loanDelayData.paid,
+                paidAt: loanDelayData.paidAt
+            })
+
+        try {
+            const updatedLoanDelay = await loanDelay.save()
+            if (updatedLoanDelay.paid === true) {
+                await Loan.findByIdAndUpdate(existingLoanDelay.loanDelay.loanId._id, { status: 'active', dueDate: loanDelayData.paidAt })
+            }
+            return {
+                valid: true,
+                message: 'Multa atualizada com sucesso',
+                loanDelay: updatedLoanDelay
+            }
+        } catch (error) {
+            return {
+                valid: false,
+                message: 'Erro ao atualizar multa',
+                err: error.message
+            }
+        }
+    }
 }

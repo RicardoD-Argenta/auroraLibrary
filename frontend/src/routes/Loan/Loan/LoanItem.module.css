@@ -48,11 +48,29 @@
 }
 
 
-.name {
+.name,
+.active,
+.returned,
+.overdue,
+.lost {
     font-size: .9rem;
     width: 100%;
     min-width: 100px;
     margin-top: -2px;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.overdue,
+.lost {
+    color: var(--warning-red);
+}
+
+.returned {
+    color: var(--text-color-variant);
+    text-decoration: line-through;
 }
 
 .labelContainer {
@@ -61,6 +79,29 @@
 
 .labelContainer:last-child {
     border-bottom: none;
+}
+
+/* Delay */
+.delayButtonContainer {
+    display: flex;
+    margin-top: .5rem;
+}
+
+.delayButtonContainer button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background-color: var(--background-color);
+    padding: 0.1rem 0.5rem;
+    cursor: pointer;
+    gap: 0.5rem;
+    border: 1px solid var(--text-color-disabled);
+    border-radius: 4px;
+}
+
+.delayButtonContainer button:active {
+    background-color: var(--background-color-variant);
 }
 
 /* Clickable */
@@ -86,5 +127,10 @@
     .itemContainer {
         padding: 0 2rem 0 0;
     }
-    
+}
+
+@media screen and (max-width: 800px) {
+    .delayButtonContainer span {
+        display: none;
+    }
 }

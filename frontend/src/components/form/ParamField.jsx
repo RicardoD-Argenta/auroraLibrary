@@ -48,6 +48,7 @@ const ParamField = ({ label, value, onChange, fields }) => {
                                 value={value[field.name] ?? ''}
                                 handleOnChange={handleFieldChange}
                                 number={field.number}
+                                limit={field.limit}
                             />
                         )
                     })}

@@ -309,4 +309,127 @@ module.exports = class LoanController {
         }
     }
 
+    // ------------------------ empréstimos vencidos ------------------------ //
+
+    static async getLoanDelayById(req, res) {
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const result = await loanService.getLoanDelayById({
+            id
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                loanDelay: result.loanDelay
+            })
+        }
+    }
+
+    static async updateLoanDelay(req, res) {
+        const bodyValidation = emptyBody(req)
+        if (!bodyValidation.valid) {
+            return res.status(bodyValidation.status).json({
+                message: bodyValidation.message,
+                err: bodyValidation.err
+            })
+        }
+
+        const { id } = req.params
+        const idValidation = validateID(id)
+        if (!idValidation.valid) {
+            return res.status(idValidation.status).json({
+                message: idValidation.message,
+                err: idValidation.err
+            })
+        }
+
+        const { paid } = req.body
+        let paidAt = req.body.paidAt
+        const fieldsConfig = {
+            required: ['paid'],
+            labels: {
+                paid: 'Pago'
+            }
+        }
+
+        const paidActive = paid === true || paid === 'true'
+
+        if (paidActive) {
+            fieldsConfig.required.push('paidAt')
+            fieldsConfig.labels.paidAt = 'Data de pagamento'
+        }
+
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
+        const validBooleanFields = validateBooleanFields([
+            {
+                value: paid,
+                field: 'paid',
+                err: 'paid-not-valid'
+            }
+        ])
+        if(!validBooleanFields.valid) {
+            return res.status(400).json({
+                message: validBooleanFields.message,
+                err: validBooleanFields.err
+            })
+        }
+
+        if (paidActive) {
+            const dates = isDate({
+                dates: ['paidAt'],
+                labels: {
+                    paidAt: 'Data de pagamento'
+                }
+            })
+            const datesValidation = dates(req)
+            if (!datesValidation.valid) {
+                return res.status(datesValidation.status).json({
+                    message: datesValidation.message,
+                    err: datesValidation.err
+                })
+            }
+        } else {
+            paidAt = null
+        }
+
+        const result = await loanService.updateLoanDelay({
+            id,
+            paid,
+            paidAt
+        })
+
+        if (!result.valid) {
+            return res.status(400).json({
+                message: result.message,
+                err: result.err
+            })
+        } else {
+            return res.status(200).json({
+                message: result.message,
+                loanDelay: result.loanDelay
+            })
+        }
+
+    }
 }

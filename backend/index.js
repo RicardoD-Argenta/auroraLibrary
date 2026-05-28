@@ -19,7 +19,7 @@ app.use(cors({ credentials: true, origin: 'http://localhost:5173' }))
 app.use('/images', express.static(path.join(__dirname, 'public/images')))
 
 // configuração dos crons
-// require('./helpers/cronTabs/verifyOverdueCron')
+require('./helpers/cronTabs/verifyOverdueCron')
 
 
 // Rotas

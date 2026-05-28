@@ -815,8 +815,17 @@ module.exports = class LibraryController {
             loanDelayData.fineValue = null
         }
 
+        const reqFields = emptyFields(fieldsConfig)
+        const fieldsValidation = reqFields(req)
+        if (!fieldsValidation.valid) {
+            return res.status(fieldsValidation.status).json({
+                message: fieldsValidation.message,
+                err: fieldsValidation.err
+            })
+        }
+
         if (loanDelayData.active) {
-            if (!validator.isFloat(loanDelayData.dailyRate)) {
+            if (!validator.isFloat(String(loanDelayData.dailyRate))) {
                 return res.status(400).json({
                     message: 'Valor diário da multa inválido',
                     err: 'dailyRate-not-valid'
@@ -828,7 +837,7 @@ module.exports = class LibraryController {
                     err: 'dailyRate-not-valid'
                 })
             }
-            if (!validator.isFloat(loanDelayData.fineValue)) {
+            if (!validator.isFloat(String(loanDelayData.fineValue))) {
                 return res.status(400).json({
                     message: 'Valor fixo da multa inválido',
                     err: 'fineValue-not-valid'
@@ -840,15 +849,6 @@ module.exports = class LibraryController {
                     err: 'fineValue-not-valid'
                 })
             }
-        }
-
-        const reqFields = emptyFields(fieldsConfig)
-        const fieldsValidation = reqFields(req)
-        if (!fieldsValidation.valid) {
-            return res.status(fieldsValidation.status).json({
-                message: fieldsValidation.message,
-                err: fieldsValidation.err
-            })
         }
 
         const validBooleanFields = validateBooleanFields([
