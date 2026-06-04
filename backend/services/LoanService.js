@@ -419,7 +419,7 @@ module.exports = class LoanService {
 
             for (const loan of loans) {
                 // atualiza o status do empréstimo para vencido no bookCopy e no loan
-                await BookCopy.findByIdAndUpdate(loan.copyId, { status: 'overdue' })
+                await BookCopy.findByIdAndUpdate(loan.copyId, { status: 'borrowed' })
                 await Loan.findByIdAndUpdate(loan._id, { status: 'overdue' })
                 const delay = await LoanDelay.findOne({ loanId: loan._id })
 
@@ -461,7 +461,7 @@ module.exports = class LoanService {
 
             for (const loan of overdueLoans) {
                 // atualiza o status do empréstimo para vencido no bookCopy e no loan
-                await BookCopy.findByIdAndUpdate(loan.copyId, { status: 'overdue' })
+                await BookCopy.findByIdAndUpdate(loan.copyId, { status: 'borrowed' })
                 const delay = await LoanDelay.findOne({ loanId: loan._id })
 
                 if (delay) {
