@@ -1,0 +1,41 @@
+.top-books {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    padding: 0 .5rem 0 1.2rem;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 140px 1fr 28px;
+    align-items: center;
+    gap: 10px;
+}
+
+.title {
+    font-size: .85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bar-track {
+    background-color: var(--background-color-variant);
+    border-radius: 4px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background-color: var(--selected-color);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.count {
+    font-size: .8rem;
+    text-align: right;
+    color: var(--text-color);
+}

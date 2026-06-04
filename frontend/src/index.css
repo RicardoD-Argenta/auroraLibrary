@@ -11,8 +11,11 @@
   --background-color: #faf7f0;
   --background-color-variant: #dbd5c8;
   --background-color-variant-2: #eee9dc;
+  --background-color-variant-3: #f3e2c9;
   --warning-red: #c0392b;
   --warning-red-selected: #a93226;
+  --warning-red-lighter: #e05151;
+
 }
 
 * {
@@ -25,6 +28,7 @@
 
 body {
   background-color: var(--background-color);
+  overflow-x: hidden;
 }
 
 .Toastify__toast {

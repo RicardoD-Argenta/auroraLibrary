@@ -1,10 +1,8 @@
 const mongoose = require("mongoose")
 const { Schema } = mongoose
 
-const LoanDelay = mongoose.model(
-    'LoanDelay',
-    new Schema(
-        {
+const loanDelaySchema = new Schema(
+    {
         code: {
             type: String,
             required: true,
@@ -33,7 +31,8 @@ const LoanDelay = mongoose.model(
         }
     },
     { timestamps: true }
-    )
 )
+
+const LoanDelay = mongoose.models.LoanDelay || mongoose.model('LoanDelay', loanDelaySchema)
 
 module.exports = LoanDelay

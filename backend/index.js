@@ -28,11 +28,13 @@ const AuthRoutes = require('./routes/AuthRoutes')
 const LibraryRoutes = require('./routes/LibraryRoutes')
 const BookRoutes = require('./routes/BookRoutes')
 const LoanRoutes = require('./routes/LoanRoutes')
+const DashboardRoutes = require('./routes/DashboardRoutes')
 
 app.use('/auth', AuthRoutes)
 app.use('/library', LibraryRoutes)
 app.use('/book', BookRoutes)
 app.use('/loan', LoanRoutes)
+app.use('/dashboard', DashboardRoutes)
 
 // Inicialização
 const start = async () => {

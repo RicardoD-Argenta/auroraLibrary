@@ -61,7 +61,7 @@ const CreateLoan = () => {
         }
         const newLoan = await createLoan(payload)
         setLoan(initialState)
-        navigate(`/loan/edit?id=${newLoan._id}`)
+        navigate(`/loan/edit?id=${newLoan.loan._id}`)
     }
 
     return (

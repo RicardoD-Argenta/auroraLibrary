@@ -1,0 +1,45 @@
+.activity-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: .9rem;
+    padding: .5rem 0;
+    border-bottom: 1px solid var(--grey);
+}
+
+.activity-container:first-child {
+    padding-top: 0;
+    margin-top: -.7rem;
+}
+
+.activity-container:last-child {
+    border-bottom: none;
+}
+
+.content-container {
+    max-width: 75%;
+    overflow: hidden;
+}
+
+.book-container {
+    display: flex;
+    flex-direction: row;
+    font-size: .7rem;
+    gap: 4px;
+}
+
+.member {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.date {
+    font-size: .8rem;
+}
