@@ -1,0 +1,37 @@
+.card {
+    display: flex;
+    flex-direction: column;
+    width: 10rem;
+    height: 10rem;
+    padding: 1rem .5rem 1rem 1rem;
+    font-size: .9rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    background-color: var(--background-color);
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-header {
+    display: flex;
+    margin-bottom: .5rem;
+    font-weight: bold;
+    height: 2.2rem;
+}
+
+.card-header svg {
+    position: relative;
+    font-size: .75rem;
+    top: 1px;
+}
+
+
+.card-body {
+    font-size: 2rem;
+    margin-bottom: .5rem;
+}
