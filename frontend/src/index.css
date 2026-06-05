@@ -32,6 +32,19 @@ body {
   overflow-x: hidden;
 }
 
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--text-color-disabled);
+  border-radius: 10px;
+}
+
 .Toastify__toast {
   background-color: var(--background-color) !important;
 }
