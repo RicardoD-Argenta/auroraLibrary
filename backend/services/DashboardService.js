@@ -108,13 +108,27 @@ module.exports = class DashboardService {
             ])
 
             const totalForPercentage = genreDistRaw.reduce((acc, g) => acc + g.total, 0)
-            const genreDistribution = genreDistRaw.map(g => ({
+            const top5 = genreDistRaw.slice(0, 5)
+            const rest = genreDistRaw.slice(5)
+
+            const genreDistribution = top5.map(g => ({
                 genre: g.genre,
                 total: g.total,
                 percentage: totalForPercentage > 0
                     ? Math.round((g.total / totalForPercentage) * 1000) / 10
                     : 0
             }))
+
+            if (rest.length > 0) {
+                const othersTotal = rest.reduce((acc, g) => acc + g.total, 0)
+                genreDistribution.push({
+                    genre: 'Outros',
+                    total: othersTotal,
+                    percentage: totalForPercentage > 0
+                        ? Math.round((othersTotal / totalForPercentage) * 1000) / 10
+                        : 0
+                })
+            }
 
             // --- top membros que mais pegaram emprestado no mês atual ---
             const topMembers = await Loan.aggregate([
@@ -164,6 +178,8 @@ module.exports = class DashboardService {
 
             // --- lista de empréstimos vencidos ---
             const overdueLoansData = await Loan.find({ status: 'overdue' })
+                .sort({ dueDate: 1 })
+                .limit(5)
                 .populate({ path: 'memberId', select: 'name' })
                 .populate({ path: 'copyId', populate: { path: 'bookId', select: 'title' } })
                 .lean()
@@ -179,6 +195,8 @@ module.exports = class DashboardService {
                 bookTitle: l.copyId?.bookId?.title ?? null,
                 daysLate: Math.floor((now - new Date(l.dueDate)) / (1000 * 60 * 60 * 24))
             })).sort((a, b) => b.daysLate - a.daysLate)
+
+            const overdueRemaining = overdueLoans > overdueList.length ? overdueLoans - overdueList.length : null
 
             return {
                 valid: true,
@@ -196,6 +214,7 @@ module.exports = class DashboardService {
                     genreDistribution,
                     recentActivity,
                     overdueList,
+                    overdueRemaining,
                     topMembers
                 }
             }

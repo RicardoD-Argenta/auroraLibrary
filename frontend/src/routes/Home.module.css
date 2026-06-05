@@ -65,6 +65,13 @@
     font-weight: bold;
 }
 
+.remaining-alerts {
+    margin-top: 1rem;
+    align-self: center;
+    font-weight: bold;
+    color: var(--text-color-variant-2);
+}
+
 @media (min-width: 1360px) {
     .cards-list {
         gap: 5rem;
