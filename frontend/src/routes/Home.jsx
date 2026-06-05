@@ -73,6 +73,7 @@ const Home = () => {
             renderItem={item => <AlertItem key={item.overdueId} item={item} />}
             emptyMessage="Nenhum alerta encontrado."
             />
+            {dashboard?.overdueRemaining ? <div className={styles["remaining-alerts"]}>+ {dashboard.overdueRemaining} empréstimos atrasados</div> : null}
           </div>
           <div className={styles["books-container"]}>
             <div className={styles["month-graph"]}>
