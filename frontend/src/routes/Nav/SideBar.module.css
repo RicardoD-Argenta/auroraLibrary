@@ -7,12 +7,22 @@
     height: 100vh;
     background-color: var(--background-color);
     z-index: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sideBar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 }
 
 /* menu icon */
 .sideBarHeader {
     display: flex;
     position: relative;
+    flex-shrink: 0;
 }
 
 .sideBarHeader button {
@@ -27,6 +37,26 @@
 }
 
 /* menu content */
+.sideBarContent {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 1rem;
+    margin-right: 10px;
+}
+
+.sideBarContent::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sideBarContent::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sideBarContent::-webkit-scrollbar-thumb {
+    background-color: var(--text-color-disabled);
+    border-radius: 10px;
+}
+
 .sideBarContent li {
     list-style: none;
     margin-bottom: 1rem ;
