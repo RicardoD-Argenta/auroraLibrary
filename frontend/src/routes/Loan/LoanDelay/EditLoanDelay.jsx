@@ -82,7 +82,7 @@ const EditLoanDelay = () => {
 
     return (
         <div>
-            <PageHeader title={'Editar Empréstimo'}>
+            <PageHeader title={'Editar Multa'}>
                 <Button onClick={() => navigate('/loan/list')}>Voltar</Button>
                 <Button variant="submit" type="submit" form="edit-loan-form">Salvar</Button>
             </PageHeader>
