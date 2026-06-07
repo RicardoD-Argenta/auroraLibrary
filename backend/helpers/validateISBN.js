@@ -1,6 +1,6 @@
 const validateISBN = (isbn) => {
     // remove hífens e espaços
-    const clean = isbn.replace(/[\s-]/g, '')
+    const clean = isbn.replace(/[\s-]/g, '').toUpperCase()
 
     // ISBN-10
     if (clean.length === 10) {

@@ -5,6 +5,7 @@
     const Library = require('../models/Library/Library')
     const LibraryParams = require('../models/Library/LibraryParams')
     const BookCopy = require('../models/Book/BookCopy')
+    const Loan = require('../models/Loan/Loans')
 
 // helpers
     const Counter = require('../models/Counter')
@@ -193,6 +194,15 @@ module.exports = class LibraryService {
         const existingMember = await this.existingMember(memberData)
         if (existingMember && !existingMember.valid) {
             return existingMember
+        }
+
+        const existingLoans = await Loan.find({ memberId: existingMember.member._id })
+        if (existingLoans.length > 0) {
+            return {
+                valid: false,
+                message: 'Não é possível excluir o membro pois existem empréstimos cadastrados',
+                err: 'member-has-loans'
+            }
         }
 
         try {

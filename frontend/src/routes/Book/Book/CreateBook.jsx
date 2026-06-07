@@ -123,7 +123,7 @@ const CreateBook = () => {
                             <Input text="Linguagem *" type="text" name="language" placeholder="" limit={255} value={book.language} handleOnChange={handleChange} />
                         </div>
                         <div className={styles['input-wrapper']}>
-                            <Input text="ISBN *" type="text" name="isbn" placeholder="" limit={20} value={book.isbn} handleOnChange={handleChange} number />
+                            <Input text="ISBN *" type="text" name="isbn" placeholder="" limit={20} value={book.isbn} handleOnChange={handleChange} />
                         </div>
                         <div className={styles['input-wrapper']}>
                             <Input text="Edição" type="text" name="edition" placeholder="" limit={255} value={book.edition} handleOnChange={handleChange} />
